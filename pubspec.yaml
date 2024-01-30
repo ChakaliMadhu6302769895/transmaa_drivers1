@@ -56,7 +56,10 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - assets/Finalized_logo_TRANSMAA-removebg-preview.png
+    - assets/Final logo.png
+    - assets/Vector.svg
+    - assets/Vector.png
+    - assets/Vector.svg
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
