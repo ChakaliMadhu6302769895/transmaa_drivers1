@@ -18,9 +18,21 @@ class _MyHomePageState extends State<MyHomePage> {
         color: Color(0xfff5f5f5),
         child: Column(
           children: [
+            SizedBox(height: 40,),
             Container(
-              color: Colors.white,
-              height: 65,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 3,
+                    blurRadius: 5,
+                    offset: Offset(0, 1),
+                  ),
+                ],
+              ),
+              padding: EdgeInsets.only(top: 10 , right: 10),
+              height: 70,
               width: double.infinity,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -29,20 +41,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Image.asset(
                       'assets/Finalized_logo_TRANSMAA-removebg-preview.png',
                       fit: BoxFit.cover,
-                      height: 100,
-                      width: 200,
+                      height: 65,
+                      width: 230,
                     ),
                   ),
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(Icons.notifications_none_rounded),
+                        icon: Icon(Icons.notifications_none_rounded ,size: 30,color: Colors.black,),
                         onPressed: () {
                           // Handle notification icon press
                         },
                       ),
                       IconButton(
-                        icon: Icon(Icons.help_outline_outlined),
+                        icon: Icon(Icons.help_outline_outlined , size: 30, color: Colors.black,),
                         onPressed: () {
                           // Handle help icon press
                         },
@@ -52,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-            SizedBox(height: 5),
+            SizedBox(height: 10),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -67,28 +79,43 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
-            SizedBox(height: 5),
+            SizedBox(height: 10),
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(5),
               ),
-              height: 250,
-              width: 470,
+              height: 260,
+              width: 370,
               padding: EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.circle_outlined, color: Colors.black, size: 15),
+                      Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.black,
+                            width: 4,
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        Icons.circle_outlined,
+                        color: Colors.transparent,
+                       size: 1,
+                      ),
                       SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              'From ,', // Label for the first TextField
+                              'From',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
@@ -98,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             TextField(
                               controller: fromLocationController,
                               decoration: InputDecoration(
-                                hintText: 'Load it....', // Hint for the first TextField
+                                hintText: 'Load it....',
                                 border: OutlineInputBorder(),
                                 contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                               ),
@@ -111,14 +138,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(Icons.location_on_outlined, color: Colors.red, size: 15),
+                      Icon(Icons.location_on_outlined, color: Colors.red, size: 22),
                       SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              'To ,', // Label for the second TextField
+                              'To',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
@@ -128,7 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             TextField(
                               controller: toLocationController,
                               decoration: InputDecoration(
-                                hintText: 'Unload to....', // Hint for the second TextField
+                                hintText: 'Unload to....',
                                 border: OutlineInputBorder(),
                                 contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                               ),
@@ -139,23 +166,28 @@ class _MyHomePageState extends State<MyHomePage> {
                     ],
                   ),
                   SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      String fromLocation = fromLocationController.text;
-                      String toLocation = toLocationController.text;
-                      // Perform your search operation here
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.grey[400],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
+                  Row(
+                    children: [
+                      Padding(padding: EdgeInsets.only(left: 28)),
+                      ElevatedButton(
+                        onPressed: () {
+
+                        },
+                        style: ElevatedButton.styleFrom(
+                          fixedSize: Size(310, 40),
+                          primary: Colors.grey[400],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          'Search',
+                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18, color: Colors.black),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      'Search',
-                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18, color: Colors.black),
-                    ),
+                    ],
                   ),
+
                 ],
               ),
             ),
