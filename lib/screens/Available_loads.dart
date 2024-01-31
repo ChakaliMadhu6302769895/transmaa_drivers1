@@ -38,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Row(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 20 , bottom: 5),
+                    padding: const EdgeInsets.only(left: 20, bottom: 5),
                     child: Container(
                       child: Image.asset(
                         'assets/Final logo.png',
@@ -78,7 +78,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-
             SizedBox(height: 10),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,23 +111,28 @@ class _MyHomePageState extends State<MyHomePage> {
                       children: [
                         Row(
                           children: [
-                            Container(
-                              width: 18,
-                              height: 18,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.black,
-                                  width: 4,
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: Container(
+                                width: 18,
+                                height: 18,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.black,
+                                    width: 4,
+                                  ),
                                 ),
                               ),
                             ),
-                            Icon(
-                              Icons.circle_outlined,
-                              color: Colors.transparent,
-                              size: 1,
+                            Padding(
+                              padding: const EdgeInsets.only(right: 10 , left: 5),
+                              child: Icon(
+                                Icons.circle_outlined,
+                                color: Colors.transparent,
+                                size: 1,
+                              ),
                             ),
-                            SizedBox(width: 10),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -164,11 +168,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         Row(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(top: 20),
+                              padding: const EdgeInsets.only(top: 20,),
                               child: Icon(
                                 Icons.location_on_outlined,
                                 color: Colors.red,
-                                size: 20,
+                                size: 25,
                               ),
                             ),
                             SizedBox(width: 10),
@@ -233,6 +237,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ],
                     ),
+
                   ),
                   SizedBox(width: 10),
                   Container(
@@ -255,3 +260,4 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
