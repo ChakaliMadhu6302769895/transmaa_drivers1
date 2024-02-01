@@ -123,7 +123,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 height: 260,
                 width: 370,
@@ -153,7 +153,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               ),
                               Padding(
                                 padding:
-                                    const EdgeInsets.only(right: 10, left: 5),
+                                const EdgeInsets.only(right: 5, left: 5),
                                 child: Icon(
                                   Icons.circle_outlined,
                                   color: Colors.transparent,
@@ -163,7 +163,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
+                                  CrossAxisAlignment.stretch,
                                   children: [
                                     Text(
                                       'From',
@@ -200,14 +200,14 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                 child: Icon(
                                   Icons.location_on_outlined,
                                   color: Colors.red,
-                                  size: 25,
+                                  size: 20,
                                 ),
                               ),
                               SizedBox(width: 10),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
+                                  CrossAxisAlignment.stretch,
                                   children: [
                                     Row(
                                       children: [
