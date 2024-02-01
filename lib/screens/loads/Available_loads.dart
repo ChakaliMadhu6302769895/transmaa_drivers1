@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-
 import '../appbar_icons/helpline_screen.dart';
 import '../appbar_icons/notification_screen.dart';
-
 
 class LoadsScreen extends StatefulWidget {
   const LoadsScreen({Key? key});
@@ -21,7 +19,6 @@ class _LoadsScreenState extends State<LoadsScreen> {
       backgroundColor: Color(0xfff5f5f5),
       body: SingleChildScrollView(
         child: Container(
-        //  color: Color(0xfff5f5f5),
           child: Column(
             children: [
               SizedBox(height: 25),
@@ -57,26 +54,51 @@ class _LoadsScreenState extends State<LoadsScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           IconButton(
-                            icon: Icon(
-                              Icons.notifications_none_rounded,
-                              size: 30,
-                              color: Colors.black,
+                            icon: Tooltip(
+                              message: 'Notifications',
+                              decoration: BoxDecoration(
+                                color: Colors.red[400],
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Icon(
+                                Icons.notifications_none_rounded,
+                                size: 30,
+                                color: Colors.black,
+                              ),
                             ),
                             onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=>NotificationScreen()));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => NotificationScreen(),
+                                ),
+                              );
                             },
                           ),
                           IconButton(
-                            icon: Icon(
-                              Icons.help_outline_outlined,
-                              size: 30,
-                              color: Colors.black,
+                            icon: Tooltip(
+                              message: 'Help',
+                              decoration: BoxDecoration(
+                                color: Colors.red[400],
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Icon(
+                                Icons.help_outline_outlined,
+                                size: 30,
+                                color: Colors.black,
+                              ),
                             ),
                             onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=>HelplineScreen()));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => HelplineScreen(),
+                                ),
+                              );
                             },
                           ),
                         ],
+
                       ),
                     ),
                   ],
@@ -131,7 +153,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               ),
                               Padding(
                                 padding:
-                                const EdgeInsets.only(right: 10, left: 5),
+                                    const EdgeInsets.only(right: 10, left: 5),
                                 child: Icon(
                                   Icons.circle_outlined,
                                   color: Colors.transparent,
@@ -141,7 +163,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment:
-                                  CrossAxisAlignment.stretch,
+                                      CrossAxisAlignment.stretch,
                                   children: [
                                     Text(
                                       'From',
@@ -185,7 +207,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment:
-                                  CrossAxisAlignment.stretch,
+                                      CrossAxisAlignment.stretch,
                                   children: [
                                     Row(
                                       children: [
