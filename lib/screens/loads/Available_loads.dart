@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:bottom_bar/bottom_bar.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key});
+import '../appbar_icons/helpline_screen.dart';
+import '../appbar_icons/notification_screen.dart';
+
+
+class LoadsScreen extends StatefulWidget {
+  const LoadsScreen({Key? key});
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _LoadsScreenState createState() => _LoadsScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _LoadsScreenState extends State<LoadsScreen> {
   TextEditingController fromLocationController = TextEditingController();
   TextEditingController toLocationController = TextEditingController();
-  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xfff5f5f5),
       body: SingleChildScrollView(
         child: Container(
-          color: Color(0xfff5f5f5),
+        //  color: Color(0xfff5f5f5),
           child: Column(
             children: [
               SizedBox(height: 25),
@@ -60,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               color: Colors.black,
                             ),
                             onPressed: () {
-                              // Handle notification icon press
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=>NotificationScreen()));
                             },
                           ),
                           IconButton(
@@ -70,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               color: Colors.black,
                             ),
                             onPressed: () {
-                              // Handle help icon press
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=>HelplineScreen()));
                             },
                           ),
                         ],
@@ -257,43 +260,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 ),
               ),
-              SizedBox(height: 20),
-              Container(
-                height: 500,
-                width: 370,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-              ),
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: BottomBar(
-        selectedIndex: _selectedIndex,
-        backgroundColor: Colors.black,
-        onTap: (int index) {
-          setState(() {
-            _selectedIndex = index;
-            // Handle navigation to other screens based on the index
-            // For example, you can use Navigator.push to navigate to different screens
-          });
-        },
-        items: [
-          BottomBarItem(
-            icon: Icon(Icons.fire_truck, color: Colors.white),
-            title: Text('Loads'), activeColor: Colors.white,
-          ),
-          BottomBarItem(
-            icon: Icon(Icons.history, color: Colors.white),
-            title: Text('History'), activeColor: Colors.white,
-          ),
-          BottomBarItem(
-            icon: Icon(Icons.person, color: Colors.white),
-            title: Text('Profile'), activeColor: Colors.white,
-          ),
-        ],
       ),
     );
   }

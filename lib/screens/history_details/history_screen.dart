@@ -7,7 +7,9 @@ class HistoryScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('History'),
       ),
-      body: Container(),
+      body: Center(
+        child: Text('History Screen Content'),
+      ),
     );
   }
 }
