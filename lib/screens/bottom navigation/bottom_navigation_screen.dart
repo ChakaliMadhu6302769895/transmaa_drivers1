@@ -20,7 +20,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: _getSelectedScreen(),
       bottomNavigationBar: BottomBar(
         selectedIndex: _selectedIndex,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         onTap: (int index) {
           setState(() {
             _selectedIndex = index;
@@ -28,19 +28,19 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         items: [
           BottomBarItem(
-            icon: Icon(Icons.fire_truck, color: Colors.red),
+            icon: Icon(Icons.fire_truck, color: Colors.white),
             title: Text('Loads'),
-            activeColor: Colors.red,
+            activeColor: Colors.white,
           ),
           BottomBarItem(
-            icon: Icon(Icons.history, color: Colors.red),
+            icon: Icon(Icons.history, color: Colors.white),
             title: Text('History'),
-            activeColor: Colors.red,
+            activeColor: Colors.white,
           ),
           BottomBarItem(
-            icon: Icon(Icons.person, color: Colors.red),
+            icon: Icon(Icons.person, color: Colors.white),
             title: Text('Profile'),
-            activeColor: Colors.red,
+            activeColor: Colors.white,
           ),
         ],
       ),

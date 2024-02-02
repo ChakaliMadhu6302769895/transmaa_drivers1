@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../appbar_icons/helpline_screen.dart';
 import '../appbar_icons/notification_screen.dart';
 
@@ -13,6 +16,9 @@ class _LoadsScreenState extends State<LoadsScreen> {
   TextEditingController fromLocationController = TextEditingController();
   TextEditingController toLocationController = TextEditingController();
 
+  List<String> locationDetails = [];
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,6 +27,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
         child: Container(
           child: Column(
             children: [
+              // App Bar Section
               SizedBox(height: 25),
               Container(
                 height: 70,
@@ -53,6 +60,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
+                          // Notifications Icon
                           IconButton(
                             icon: Tooltip(
                               message: 'Notifications',
@@ -75,6 +83,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               );
                             },
                           ),
+                          // Help Icon
                           IconButton(
                             icon: Tooltip(
                               message: 'Help',
@@ -98,12 +107,12 @@ class _LoadsScreenState extends State<LoadsScreen> {
                             },
                           ),
                         ],
-
                       ),
                     ),
                   ],
                 ),
               ),
+              // Greetings Section
               SizedBox(height: 10),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,12 +128,13 @@ class _LoadsScreenState extends State<LoadsScreen> {
                   ),
                 ],
               ),
+              // Input Section
               SizedBox(height: 10),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow:[
+                  boxShadow: [
                     BoxShadow(
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 3,
@@ -143,6 +153,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          // From Location Input
                           Row(
                             children: [
                               Padding(
@@ -161,7 +172,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               ),
                               Padding(
                                 padding:
-                                const EdgeInsets.only(right: 5, left: 5),
+                                    const EdgeInsets.only(right: 5, left: 5),
                                 child: Icon(
                                   Icons.circle_outlined,
                                   color: Colors.transparent,
@@ -171,7 +182,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment:
-                                  CrossAxisAlignment.stretch,
+                                      CrossAxisAlignment.stretch,
                                   children: [
                                     Text(
                                       'From',
@@ -200,6 +211,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               ),
                             ],
                           ),
+                          // To Location Input
                           SizedBox(height: 10),
                           Row(
                             children: [
@@ -215,7 +227,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment:
-                                  CrossAxisAlignment.stretch,
+                                      CrossAxisAlignment.stretch,
                                   children: [
                                     Row(
                                       children: [
@@ -248,12 +260,15 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               ),
                             ],
                           ),
+                          // Search Button
                           SizedBox(height: 20),
                           Row(
                             children: [
                               Padding(padding: EdgeInsets.only(left: 33)),
                               ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  _searchButtonPressed();
+                                },
                                 style: ElevatedButton.styleFrom(
                                   fixedSize: Size(275, 40),
                                   primary: Colors.grey[400],
@@ -275,6 +290,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                         ],
                       ),
                     ),
+                    // Image Section
                     SizedBox(width: 10),
                     Container(
                       child: Row(
@@ -290,22 +306,42 @@ class _LoadsScreenState extends State<LoadsScreen> {
                   ],
                 ),
               ),
-              SizedBox(height: 20,),
+              SizedBox(
+                height: 20,
+              ),
+              // Location Details Section
               Container(
-                height: 400,
-                width:370,
+                height: 600,
+                width: 370,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
-                  boxShadow:[
+                  boxShadow: [
                     BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 3,
-                        blurRadius: 5,
-                        offset: Offset(0, 1),
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 3,
+                      blurRadius: 5,
+                      offset: Offset(0, 1),
                     ),
                   ],
                 ),
+                child: isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : locationDetails.isNotEmpty
+                        ? ListView.builder(
+                            itemCount: locationDetails.length,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                title: Text(locationDetails[index]),
+                                // Add more details if needed
+                              );
+                            },
+                          )
+                        : Center(
+                            child: Text('No location details available'),
+                          ),
               ),
             ],
           ),
@@ -313,4 +349,52 @@ class _LoadsScreenState extends State<LoadsScreen> {
       ),
     );
   }
+
+  // Search Button Pressed Method
+  void _searchButtonPressed() async {
+    setState(() {
+      isLoading = true;
+      locationDetails.clear();
+    });
+
+    try {
+      // Initialize Firebase
+      await Firebase.initializeApp();
+
+      // Fetch location details from Firebase
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('loads') // Replace with your collection name
+          .get();
+
+      List<String> details = [];
+
+      for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
+        // Log the entire document to inspect its structure
+        print('Document Data: ${documentSnapshot.data()}');
+
+        // Use ?. to handle potential null values and as Map<String, dynamic>
+        Map<String, dynamic>? data = documentSnapshot.data() as Map<String, dynamic>?;
+
+        // Check if data is not null and 'loads' field exists in the document
+        if (data != null && data.containsKey('loads')) {
+          String loads = data['loads'] as String;
+          details.add(loads);
+        } else {
+          print('Field "loads" is missing or null in document: ${documentSnapshot.id}');
+        }
+      }
+
+      setState(() {
+        isLoading = false;
+        locationDetails = details;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print('Error fetching data: $e');
+    }
+  }
+
+
 }
