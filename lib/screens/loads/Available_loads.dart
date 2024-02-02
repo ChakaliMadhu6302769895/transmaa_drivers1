@@ -124,6 +124,14 @@ class _LoadsScreenState extends State<LoadsScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
+                  boxShadow:[
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 3,
+                      blurRadius: 5,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
                 ),
                 height: 260,
                 width: 370,
@@ -278,6 +286,23 @@ class _LoadsScreenState extends State<LoadsScreen> {
                           ),
                         ],
                       ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20,),
+              Container(
+                height: 400,
+                width:370,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow:[
+                    BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 3,
+                        blurRadius: 5,
+                        offset: Offset(0, 1),
                     ),
                   ],
                 ),
