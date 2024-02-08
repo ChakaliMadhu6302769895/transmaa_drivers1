@@ -176,7 +176,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               ),
                               Padding(
                                 padding:
-                                const EdgeInsets.only(right: 5, left: 5),
+                                    const EdgeInsets.only(right: 5, left: 5),
                                 child: Icon(
                                   Icons.circle_outlined,
                                   color: Colors.transparent,
@@ -186,7 +186,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment:
-                                  CrossAxisAlignment.stretch,
+                                      CrossAxisAlignment.stretch,
                                   children: [
                                     Text(
                                       'From',
@@ -237,7 +237,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment:
-                                  CrossAxisAlignment.stretch,
+                                      CrossAxisAlignment.stretch,
                                   children: [
                                     Row(
                                       children: [
@@ -284,7 +284,8 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               ElevatedButton(
                                 onPressed: isSearchEnabled
                                     ? _searchButtonPressed
-                                    : null, // Disable button if search is not enabled
+                                    : null,
+                                // Disable button if search is not enabled
                                 style: ElevatedButton.styleFrom(
                                   fixedSize: Size(275, 40),
                                   primary: Colors.grey[400],
@@ -343,20 +344,28 @@ class _LoadsScreenState extends State<LoadsScreen> {
                 padding: EdgeInsets.all(20),
                 child: documentData != null
                     ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('From Location: ${fromLocation ?? 'Not provided'}'),
-                    Text('To Location: ${toLocation ?? 'Not provided'}'),
-                    Text(
-                        'Selected Date: ${documentData!['selectedDate']}'),
-                    Text(
-                        'Selected Goods Type: ${documentData!['selectedGoodsType']}'),
-                    Text(
-                        'Selected Time: ${documentData!['selectedTime']}'),
-                    Text(
-                        'Selected Truck: ${documentData!['selectedTruck']}'),
-                  ],
-                )
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          Text("Matched Locations : " , style: TextStyle(fontSize: 20 , color: Colors.black),),
+                          Divider(
+                            thickness: 2,
+                            color: Colors.brown,
+                          ),
+
+                          Text(
+                              'From Location: ${fromLocation ?? 'Not provided'}'),
+                          Text('To Location: ${toLocation ?? 'Not provided'}'),
+                          Text(
+                              'Selected Date: ${documentData!['selectedDate']}'),
+                          Text(
+                              'Selected Goods Type: ${documentData!['selectedGoodsType']}'),
+                          Text(
+                              'Selected Time: ${documentData!['selectedTime']}'),
+                          Text(
+                              'Selected Truck: ${documentData!['selectedTruck']}'),
+                        ],
+                      )
                     : Text('No document data available'),
               ),
             ],
@@ -369,8 +378,10 @@ class _LoadsScreenState extends State<LoadsScreen> {
   // Method to update the state of the search button
   void updateSearchButtonState() {
     setState(() {
-      isSearchEnabled = fromLocation != null && fromLocation!.isNotEmpty &&
-          toLocation != null && toLocation!.isNotEmpty;
+      isSearchEnabled = fromLocation != null &&
+          fromLocation!.isNotEmpty &&
+          toLocation != null &&
+          toLocation!.isNotEmpty;
     });
   }
 
@@ -403,7 +414,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
         // No matched locations found
         setState(() {
           isLoading = false;
-          documentData = null;
+          documentData = null; // Clear documentData if no match found
         });
       }
     } catch (e) {
@@ -414,5 +425,5 @@ class _LoadsScreenState extends State<LoadsScreen> {
       print('Error fetching data: $e');
     }
   }
-}
 
+}
