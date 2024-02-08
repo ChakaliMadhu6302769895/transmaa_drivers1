@@ -17,8 +17,11 @@ class _LoadsScreenState extends State<LoadsScreen> {
   TextEditingController toLocationController = TextEditingController();
 
   Map<String, dynamic>? documentData;
+  String? fromLocation;
+  String? toLocation;
   List<String> locationDetails = [];
   bool isLoading = false;
+  bool isSearchEnabled = false; // Track if search button should be enabled
 
   @override
   Widget build(BuildContext context) {
@@ -198,6 +201,12 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                     ),
                                     TextField(
                                       controller: fromLocationController,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          fromLocation = value;
+                                          updateSearchButtonState();
+                                        });
+                                      },
                                       decoration: InputDecoration(
                                         hintText: 'Load it....',
                                         border: OutlineInputBorder(),
@@ -247,6 +256,12 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                     ),
                                     TextField(
                                       controller: toLocationController,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          toLocation = value;
+                                          updateSearchButtonState();
+                                        });
+                                      },
                                       decoration: InputDecoration(
                                         hintText: 'Unload to....',
                                         border: OutlineInputBorder(),
@@ -267,9 +282,9 @@ class _LoadsScreenState extends State<LoadsScreen> {
                             children: [
                               Padding(padding: EdgeInsets.only(left: 33)),
                               ElevatedButton(
-                                onPressed: () {
-                                  _searchButtonPressed();
-                                },
+                                onPressed: isSearchEnabled
+                                    ? _searchButtonPressed
+                                    : null, // Disable button if search is not enabled
                                 style: ElevatedButton.styleFrom(
                                   fixedSize: Size(275, 40),
                                   primary: Colors.grey[400],
@@ -330,10 +345,16 @@ class _LoadsScreenState extends State<LoadsScreen> {
                     ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Selected Date: ${documentData!['selectedDate']}'),
-                    Text('Selected Goods Type: ${documentData!['selectedGoodsType']}'),
-                    Text('Selected Time: ${documentData!['selectedTime']}'),
-                    Text('Selected Truck: ${documentData!['selectedTruck']}'),
+                    Text('From Location: ${fromLocation ?? 'Not provided'}'),
+                    Text('To Location: ${toLocation ?? 'Not provided'}'),
+                    Text(
+                        'Selected Date: ${documentData!['selectedDate']}'),
+                    Text(
+                        'Selected Goods Type: ${documentData!['selectedGoodsType']}'),
+                    Text(
+                        'Selected Time: ${documentData!['selectedTime']}'),
+                    Text(
+                        'Selected Truck: ${documentData!['selectedTruck']}'),
                   ],
                 )
                     : Text('No document data available'),
@@ -343,6 +364,14 @@ class _LoadsScreenState extends State<LoadsScreen> {
         ),
       ),
     );
+  }
+
+  // Method to update the state of the search button
+  void updateSearchButtonState() {
+    setState(() {
+      isSearchEnabled = fromLocation != null && fromLocation!.isNotEmpty &&
+          toLocation != null && toLocation!.isNotEmpty;
+    });
   }
 
   // Search Button Pressed Method
@@ -358,16 +387,20 @@ class _LoadsScreenState extends State<LoadsScreen> {
 
       // Fetch location details from Firebase
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('/accepted_orders') // Replace with your collection name
+          .collection('/pickup_requests') // Replace with your collection name
+          .where('fromLocation', isEqualTo: fromLocation)
+          .where('toLocation', isEqualTo: toLocation)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        // Assuming only one document is retrieved, you can modify this part as needed
+        // Matched locations found
         setState(() {
-          documentData = querySnapshot.docs.first.data() as Map<String, dynamic>?;
+          documentData =
+          querySnapshot.docs.first.data() as Map<String, dynamic>?;
           isLoading = false;
         });
       } else {
+        // No matched locations found
         setState(() {
           isLoading = false;
           documentData = null;
@@ -382,3 +415,4 @@ class _LoadsScreenState extends State<LoadsScreen> {
     }
   }
 }
+
