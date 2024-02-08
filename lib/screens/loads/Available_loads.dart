@@ -16,6 +16,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
   TextEditingController fromLocationController = TextEditingController();
   TextEditingController toLocationController = TextEditingController();
 
+  Map<String, dynamic>? documentData;
   List<String> locationDetails = [];
   bool isLoading = false;
 
@@ -172,7 +173,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               ),
                               Padding(
                                 padding:
-                                    const EdgeInsets.only(right: 5, left: 5),
+                                const EdgeInsets.only(right: 5, left: 5),
                                 child: Icon(
                                   Icons.circle_outlined,
                                   color: Colors.transparent,
@@ -182,7 +183,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
+                                  CrossAxisAlignment.stretch,
                                   children: [
                                     Text(
                                       'From',
@@ -227,7 +228,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
+                                  CrossAxisAlignment.stretch,
                                   children: [
                                     Row(
                                       children: [
@@ -309,10 +310,8 @@ class _LoadsScreenState extends State<LoadsScreen> {
               SizedBox(
                 height: 20,
               ),
-              // Location Details Section
+              // Document Data Section
               Container(
-                height: 600,
-                width: 370,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
@@ -325,23 +324,19 @@ class _LoadsScreenState extends State<LoadsScreen> {
                     ),
                   ],
                 ),
-                child: isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : locationDetails.isNotEmpty
-                        ? ListView.builder(
-                            itemCount: locationDetails.length,
-                            itemBuilder: (context, index) {
-                              return ListTile(
-                                title: Text(locationDetails[index]),
-                                // Add more details if needed
-                              );
-                            },
-                          )
-                        : Center(
-                            child: Text('No location details available'),
-                          ),
+                margin: EdgeInsets.all(20),
+                padding: EdgeInsets.all(20),
+                child: documentData != null
+                    ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Selected Date: ${documentData!['selectedDate']}'),
+                    Text('Selected Goods Type: ${documentData!['selectedGoodsType']}'),
+                    Text('Selected Time: ${documentData!['selectedTime']}'),
+                    Text('Selected Truck: ${documentData!['selectedTruck']}'),
+                  ],
+                )
+                    : Text('No document data available'),
               ),
             ],
           ),
@@ -363,38 +358,27 @@ class _LoadsScreenState extends State<LoadsScreen> {
 
       // Fetch location details from Firebase
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('loads') // Replace with your collection name
+          .collection('/accepted_orders') // Replace with your collection name
           .get();
 
-      List<String> details = [];
-
-      for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
-        // Log the entire document to inspect its structure
-        print('Document Data: ${documentSnapshot.data()}');
-
-        // Use ?. to handle potential null values and as Map<String, dynamic>
-        Map<String, dynamic>? data = documentSnapshot.data() as Map<String, dynamic>?;
-
-        // Check if data is not null and 'loads' field exists in the document
-        if (data != null && data.containsKey('loads')) {
-          String loads = data['loads'] as String;
-          details.add(loads);
-        } else {
-          print('Field "loads" is missing or null in document: ${documentSnapshot.id}');
-        }
+      if (querySnapshot.docs.isNotEmpty) {
+        // Assuming only one document is retrieved, you can modify this part as needed
+        setState(() {
+          documentData = querySnapshot.docs.first.data() as Map<String, dynamic>?;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+          documentData = null;
+        });
       }
-
-      setState(() {
-        isLoading = false;
-        locationDetails = details;
-      });
     } catch (e) {
       setState(() {
         isLoading = false;
+        documentData = null;
       });
       print('Error fetching data: $e');
     }
   }
-
-
 }
