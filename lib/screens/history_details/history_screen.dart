@@ -4,6 +4,10 @@ import '../appbar_icons/helpline_screen.dart';
 import '../appbar_icons/notification_screen.dart';
 
 class HistoryScreen extends StatelessWidget {
+  final Map<String, dynamic>? documentData;
+
+  HistoryScreen(this.documentData);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,7 +16,9 @@ class HistoryScreen extends StatelessWidget {
         child: Container(
           child: Column(
             children: [
-              SizedBox(height: 25,),
+              SizedBox(
+                height: 25,
+              ),
               Container(
                 height: 70,
                 decoration: BoxDecoration(
@@ -91,6 +97,129 @@ class HistoryScreen extends StatelessWidget {
                         ],
                       ),
                     ),
+                  ],
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 3,
+                      blurRadius: 5,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                ),
+                margin: EdgeInsets.all(20),
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    SizedBox(height: 20),
+                    if (documentData != null) ...[
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 3,
+                              blurRadius: 5,
+                              offset: Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        padding: EdgeInsets.all(15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'From Location:',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              '${documentData!['fromLocation'] ?? 'Not provided'}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              'Time:',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              '${documentData!['selectedTime'] ?? 'Not provided'}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              'Goods Type:',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              '${documentData!['selectedGoodsType'] ?? 'Not provided'}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              'To Location:',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              '${documentData!['toLocation'] ?? 'Not provided'}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              'Date:',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              '${documentData!['selectedDate'] ?? 'Not provided'}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              'Truck:',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              '${documentData!['selectedTruck'] ?? 'Not provided'}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ] else ...[
+                      // Display a message if no historical data is available
+                      Text('No historical data available'),
+                    ],
                   ],
                 ),
               ),

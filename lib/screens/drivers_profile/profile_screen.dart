@@ -12,7 +12,9 @@ class ProfileScreen extends StatelessWidget {
         child: Container(
           child: Column(
             children: [
-              SizedBox(height: 25,),
+              SizedBox(
+                height: 25,
+              ),
               Container(
                 height: 70,
                 decoration: BoxDecoration(
@@ -89,7 +91,6 @@ class ProfileScreen extends StatelessWidget {
                             },
                           ),
                         ],
-
                       ),
                     ),
                   ],

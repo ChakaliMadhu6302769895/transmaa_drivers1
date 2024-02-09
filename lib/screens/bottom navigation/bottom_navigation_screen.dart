@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import '../drivers_profile/profile_screen.dart';
 import '../history_details/history_screen.dart';
@@ -13,6 +15,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
+
+  // Define documentData here or wherever it's accessible
+  Map<String, dynamic>? documentData;
+
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
       case 0:
         return LoadsScreen();
       case 1:
-        return HistoryScreen();
+        return HistoryScreen(documentData);
       case 2:
         return ProfileScreen();
       default:
