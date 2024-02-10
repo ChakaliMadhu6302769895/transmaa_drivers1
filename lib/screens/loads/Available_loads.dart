@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
+import 'package:http/http.dart' as http;
+import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../appbar_icons/helpline_screen.dart';
 import '../appbar_icons/notification_screen.dart';
@@ -24,6 +28,15 @@ class _LoadsScreenState extends State<LoadsScreen> {
   bool isLoading = false;
   bool isSearchEnabled = false;
   bool isAccepted = false;
+  List<String> fromLocationSuggestions = [];
+  List<String> toLocationSuggestions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // Load document data from shared preferences when the screen initializes
+    loadDocumentData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +191,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               ),
                               Padding(
                                 padding:
-                                    const EdgeInsets.only(right: 5, left: 5),
+                                const EdgeInsets.only(right: 5, left: 5),
                                 child: Icon(
                                   Icons.circle_outlined,
                                   color: Colors.transparent,
@@ -188,7 +201,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
+                                  CrossAxisAlignment.stretch,
                                   children: [
                                     Text(
                                       'From',
@@ -208,6 +221,10 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                           fromLocation = value;
                                           updateSearchButtonState();
                                         });
+                                        if (value.isNotEmpty) {
+                                          fetchPlaceSuggestions(
+                                              value, true);
+                                        }
                                       },
                                       decoration: InputDecoration(
                                         hintText: 'Load it....',
@@ -218,6 +235,33 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                         ),
                                       ),
                                     ),
+                                    if (fromLocationSuggestions.isNotEmpty)
+                                      SizedBox(
+                                        height: 100,
+                                        child: ListView.builder(
+                                          itemCount:
+                                          fromLocationSuggestions.length,
+                                          itemBuilder: (context, index) {
+                                            return ListTile(
+                                              title: Text(
+                                                  fromLocationSuggestions[index]),
+                                              onTap: () {
+                                                setState(() {
+                                                  fromLocationController.text =
+                                                  fromLocationSuggestions[
+                                                  index];
+                                                  fromLocation =
+                                                  fromLocationSuggestions[
+                                                  index];
+                                                  fromLocationSuggestions =
+                                                  [];
+                                                  updateSearchButtonState();
+                                                });
+                                              },
+                                            );
+                                          },
+                                        ),
+                                      ),
                                   ],
                                 ),
                               ),
@@ -239,7 +283,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
+                                  CrossAxisAlignment.stretch,
                                   children: [
                                     Row(
                                       children: [
@@ -263,6 +307,9 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                           toLocation = value;
                                           updateSearchButtonState();
                                         });
+                                        if (value.isNotEmpty) {
+                                          fetchPlaceSuggestions(value, false);
+                                        }
                                       },
                                       decoration: InputDecoration(
                                         hintText: 'Unload to....',
@@ -273,6 +320,32 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                         ),
                                       ),
                                     ),
+                                    if (toLocationSuggestions.isNotEmpty)
+                                      SizedBox(
+                                        height: 100,
+                                        child: ListView.builder(
+                                          itemCount:
+                                          toLocationSuggestions.length,
+                                          itemBuilder: (context, index) {
+                                            return ListTile(
+                                              title: Text(
+                                                  toLocationSuggestions[index]),
+                                              onTap: () {
+                                                setState(() {
+                                                  toLocationController.text =
+                                                  toLocationSuggestions[
+                                                  index];
+                                                  toLocation =
+                                                  toLocationSuggestions[
+                                                  index];
+                                                  toLocationSuggestions = [];
+                                                  updateSearchButtonState();
+                                                });
+                                              },
+                                            );
+                                          },
+                                        ),
+                                      ),
                                   ],
                                 ),
                               ),
@@ -346,215 +419,215 @@ class _LoadsScreenState extends State<LoadsScreen> {
                 padding: EdgeInsets.all(20),
                 child: documentData != null
                     ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      "Available Loads : ",
+                      style: TextStyle(fontSize: 20, color: Colors.black),
+                    ),
+                    Divider(
+                      thickness: 2,
+                      color: Colors.brown,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 3,
+                            blurRadius: 5,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      padding: EdgeInsets.all(15),
+                      child: Column(
                         children: [
-                          Text(
-                            "Available Loads : ",
-                            style: TextStyle(fontSize: 20, color: Colors.black),
+                          SizedBox(height: 10),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'From Location:',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '${fromLocation ?? 'Not provided'}',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              VerticalDivider(
+                                color: Colors.black,
+                                thickness: 2,
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Time:',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '${documentData!['selectedTime']}',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              VerticalDivider(
+                                color: Colors.black,
+                                thickness: 2,
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Goods Type:',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '${documentData!['selectedGoodsType']}',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 10),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'To Location:',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '${toLocation ?? 'Not provided'}',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              VerticalDivider(
+                                color: Colors.black,
+                                thickness: 2,
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Date:',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '${documentData!['selectedDate']}',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              VerticalDivider(
+                                color: Colors.black,
+                                thickness: 2,
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Truck:',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '${documentData!['selectedTruck']}',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                           Divider(
-                            thickness: 2,
-                            color: Colors.brown,
+                            thickness: 1,
+                            color: Colors.black,
                           ),
                           SizedBox(
-                            height: 10,
+                            height: 5,
                           ),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 3,
-                                  blurRadius: 5,
-                                  offset: Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                            padding: EdgeInsets.all(15),
-                            child: Column(
-                              children: [
-                                SizedBox(height: 10),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'From Location:',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          SizedBox(height: 5),
-                                          Text(
-                                            '${fromLocation ?? 'Not provided'}',
-                                            style: TextStyle(fontSize: 16),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    VerticalDivider(
-                                      color: Colors.black,
-                                      thickness: 2,
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Time:',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          SizedBox(height: 5),
-                                          Text(
-                                            '${documentData!['selectedTime']}',
-                                            style: TextStyle(fontSize: 16),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    VerticalDivider(
-                                      color: Colors.black,
-                                      thickness: 2,
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Goods Type:',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          SizedBox(height: 5),
-                                          Text(
-                                            '${documentData!['selectedGoodsType']}',
-                                            style: TextStyle(fontSize: 16),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 10),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'To Location:',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          SizedBox(height: 5),
-                                          Text(
-                                            '${toLocation ?? 'Not provided'}',
-                                            style: TextStyle(fontSize: 16),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    VerticalDivider(
-                                      color: Colors.black,
-                                      thickness: 2,
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Date:',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          SizedBox(height: 5),
-                                          Text(
-                                            '${documentData!['selectedDate']}',
-                                            style: TextStyle(fontSize: 16),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    VerticalDivider(
-                                      color: Colors.black,
-                                      thickness: 2,
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Truck:',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          SizedBox(height: 5),
-                                          Text(
-                                            '${documentData!['selectedTruck']}',
-                                            style: TextStyle(fontSize: 16),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Divider(
-                                  thickness: 1,
-                                  color: Colors.black,
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      isAccepted = !isAccepted;
-                                    });
-                                    if (isAccepted) {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              HistoryScreen(documentData),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  child: Text(
-                                    isAccepted ? 'Accepted' : 'Accept',
-                                    style: TextStyle(fontSize: 18),
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                isAccepted = !isAccepted;
+                              });
+                              if (isAccepted) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        HistoryScreen(documentData),
                                   ),
-                                ),
-                              ],
+                                );
+                              }
+                            },
+                            child: Text(
+                              isAccepted ? 'Accepted' : 'Accept',
+                              style: TextStyle(fontSize: 18),
                             ),
                           ),
                         ],
-                      )
+                      ),
+                    ),
+                  ],
+                )
                     : Text('No document data available'),
               )
             ],
@@ -562,6 +635,24 @@ class _LoadsScreenState extends State<LoadsScreen> {
         ),
       ),
     );
+  }
+
+  // Method to load document data from shared preferences
+  void loadDocumentData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? documentDataString = prefs.getString('documentData');
+    if (documentDataString != null) {
+      setState(() {
+        documentData =
+        Map<String, dynamic>.from(json.decode(documentDataString));
+      });
+    }
+  }
+
+  // Method to save document data to shared preferences
+  void saveDocumentData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('documentData', json.encode(documentData));
   }
 
   // Method to update the state of the search button
@@ -574,7 +665,34 @@ class _LoadsScreenState extends State<LoadsScreen> {
     });
   }
 
-  // Search Button Pressed Method
+  Future<void> fetchPlaceSuggestions(String query, bool isFromLocation) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+            'https://nominatim.openstreetmap.org/search?q=$query&format=json'),
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        List<String> suggestions = [];
+        for (var item in data) {
+          String displayName = item['display_name'];
+          suggestions.add(displayName);
+        }
+        setState(() {
+          if (isFromLocation) {
+            fromLocationSuggestions = suggestions;
+          } else {
+            toLocationSuggestions = suggestions;
+          }
+        });
+      } else {
+        throw Exception('Failed to load place suggestions');
+      }
+    } catch (e) {
+      print('Error fetching place suggestions: $e');
+    }
+  }
+
   void _searchButtonPressed() async {
     setState(() {
       isLoading = true;
@@ -596,15 +714,40 @@ class _LoadsScreenState extends State<LoadsScreen> {
         // Matched locations found
         setState(() {
           documentData =
-              querySnapshot.docs.first.data() as Map<String, dynamic>?;
+          querySnapshot.docs.first.data() as Map<String, dynamic>?;
           isLoading = false;
+          // Save document data to shared preferences
+          saveDocumentData();
         });
       } else {
         // No matched locations found
-        setState(() {
-          isLoading = false;
-          documentData = null; // Clear documentData if no match found
-        });
+        // Fetch all documents from the collection
+        QuerySnapshot allDocumentsSnapshot = await FirebaseFirestore.instance
+            .collection('/pickup_requests') // Replace with your collection name
+            .get();
+
+        List<Map<String, dynamic>> allDocuments = allDocumentsSnapshot.docs
+            .map((doc) => doc.data() as Map<String, dynamic>)
+            .toList();
+
+        if (allDocuments.isNotEmpty) {
+          // Documents found
+          setState(() {
+            documentData = null; // Clear previous documentData
+            isLoading = false;
+            locationDetails = allDocuments
+                .map((load) => load['toLocation'] as String)
+                .toList();
+            // Save document data to shared preferences
+            saveDocumentData();
+          });
+        } else {
+          // No documents found
+          setState(() {
+            isLoading = false;
+            documentData = null; // Clear documentData if no documents found
+          });
+        }
       }
     } catch (e) {
       setState(() {
