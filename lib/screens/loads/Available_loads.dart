@@ -1,10 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../appbar_icons/helpline_screen.dart';
 import '../appbar_icons/notification_screen.dart';
@@ -28,15 +24,6 @@ class _LoadsScreenState extends State<LoadsScreen> {
   bool isLoading = false;
   bool isSearchEnabled = false;
   bool isAccepted = false;
-  List<String> fromLocationSuggestions = [];
-  List<String> toLocationSuggestions = [];
-
-  @override
-  void initState() {
-    super.initState();
-    // Load document data from shared preferences when the screen initializes
-    loadDocumentData();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +33,6 @@ class _LoadsScreenState extends State<LoadsScreen> {
         child: Container(
           child: Column(
             children: [
-              // App Bar Section
-              SizedBox(height: 25),
               Container(
                 height: 70,
                 decoration: BoxDecoration(
@@ -221,10 +206,6 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                           fromLocation = value;
                                           updateSearchButtonState();
                                         });
-                                        if (value.isNotEmpty) {
-                                          fetchPlaceSuggestions(
-                                              value, true);
-                                        }
                                       },
                                       decoration: InputDecoration(
                                         hintText: 'Load it....',
@@ -235,33 +216,6 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                         ),
                                       ),
                                     ),
-                                    if (fromLocationSuggestions.isNotEmpty)
-                                      SizedBox(
-                                        height: 100,
-                                        child: ListView.builder(
-                                          itemCount:
-                                          fromLocationSuggestions.length,
-                                          itemBuilder: (context, index) {
-                                            return ListTile(
-                                              title: Text(
-                                                  fromLocationSuggestions[index]),
-                                              onTap: () {
-                                                setState(() {
-                                                  fromLocationController.text =
-                                                  fromLocationSuggestions[
-                                                  index];
-                                                  fromLocation =
-                                                  fromLocationSuggestions[
-                                                  index];
-                                                  fromLocationSuggestions =
-                                                  [];
-                                                  updateSearchButtonState();
-                                                });
-                                              },
-                                            );
-                                          },
-                                        ),
-                                      ),
                                   ],
                                 ),
                               ),
@@ -307,9 +261,6 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                           toLocation = value;
                                           updateSearchButtonState();
                                         });
-                                        if (value.isNotEmpty) {
-                                          fetchPlaceSuggestions(value, false);
-                                        }
                                       },
                                       decoration: InputDecoration(
                                         hintText: 'Unload to....',
@@ -320,32 +271,6 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                         ),
                                       ),
                                     ),
-                                    if (toLocationSuggestions.isNotEmpty)
-                                      SizedBox(
-                                        height: 100,
-                                        child: ListView.builder(
-                                          itemCount:
-                                          toLocationSuggestions.length,
-                                          itemBuilder: (context, index) {
-                                            return ListTile(
-                                              title: Text(
-                                                  toLocationSuggestions[index]),
-                                              onTap: () {
-                                                setState(() {
-                                                  toLocationController.text =
-                                                  toLocationSuggestions[
-                                                  index];
-                                                  toLocation =
-                                                  toLocationSuggestions[
-                                                  index];
-                                                  toLocationSuggestions = [];
-                                                  updateSearchButtonState();
-                                                });
-                                              },
-                                            );
-                                          },
-                                        ),
-                                      ),
                                   ],
                                 ),
                               ),
@@ -637,24 +562,6 @@ class _LoadsScreenState extends State<LoadsScreen> {
     );
   }
 
-  // Method to load document data from shared preferences
-  void loadDocumentData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? documentDataString = prefs.getString('documentData');
-    if (documentDataString != null) {
-      setState(() {
-        documentData =
-        Map<String, dynamic>.from(json.decode(documentDataString));
-      });
-    }
-  }
-
-  // Method to save document data to shared preferences
-  void saveDocumentData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('documentData', json.encode(documentData));
-  }
-
   // Method to update the state of the search button
   void updateSearchButtonState() {
     setState(() {
@@ -665,34 +572,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
     });
   }
 
-  Future<void> fetchPlaceSuggestions(String query, bool isFromLocation) async {
-    try {
-      final response = await http.get(
-        Uri.parse(
-            'https://nominatim.openstreetmap.org/search?q=$query&format=json'),
-      );
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        List<String> suggestions = [];
-        for (var item in data) {
-          String displayName = item['display_name'];
-          suggestions.add(displayName);
-        }
-        setState(() {
-          if (isFromLocation) {
-            fromLocationSuggestions = suggestions;
-          } else {
-            toLocationSuggestions = suggestions;
-          }
-        });
-      } else {
-        throw Exception('Failed to load place suggestions');
-      }
-    } catch (e) {
-      print('Error fetching place suggestions: $e');
-    }
-  }
-
+  // Search Button Pressed Method
   void _searchButtonPressed() async {
     setState(() {
       isLoading = true;
@@ -716,38 +596,70 @@ class _LoadsScreenState extends State<LoadsScreen> {
           documentData =
           querySnapshot.docs.first.data() as Map<String, dynamic>?;
           isLoading = false;
-          // Save document data to shared preferences
-          saveDocumentData();
         });
       } else {
         // No matched locations found
-        // Fetch all documents from the collection
-        QuerySnapshot allDocumentsSnapshot = await FirebaseFirestore.instance
+        setState(() {
+          isLoading = false;
+          documentData = null; // Clear documentData if no match found
+        });
+
+        // Fetch all stored from location and to location data
+        QuerySnapshot allLocationsSnapshot = await FirebaseFirestore.instance
             .collection('/pickup_requests') // Replace with your collection name
             .get();
 
-        List<Map<String, dynamic>> allDocuments = allDocumentsSnapshot.docs
-            .map((doc) => doc.data() as Map<String, dynamic>)
-            .toList();
+        List<String> allFromLocations = [];
+        List<String> allToLocations = [];
 
-        if (allDocuments.isNotEmpty) {
-          // Documents found
-          setState(() {
-            documentData = null; // Clear previous documentData
-            isLoading = false;
-            locationDetails = allDocuments
-                .map((load) => load['toLocation'] as String)
-                .toList();
-            // Save document data to shared preferences
-            saveDocumentData();
-          });
-        } else {
-          // No documents found
-          setState(() {
-            isLoading = false;
-            documentData = null; // Clear documentData if no documents found
-          });
-        }
+        // Extract all from location and to location data
+        allLocationsSnapshot.docs.forEach((doc) {
+          allFromLocations.add(doc['fromLocation']);
+          allToLocations.add(doc['toLocation']);
+        });
+
+        // Remove duplicates
+        allFromLocations = allFromLocations.toSet().toList();
+        allToLocations = allToLocations.toSet().toList();
+
+        // Update locationDetails list
+        setState(() {
+          locationDetails = [
+            ...allFromLocations,
+            ...allToLocations,
+          ];
+        });
+
+        // Show dialog with suggestions
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Suggestions'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Available From Locations:'),
+                  SizedBox(height: 5),
+                  Text(allFromLocations.join(', ')),
+                  SizedBox(height: 10),
+                  Text('Available To Locations:'),
+                  SizedBox(height: 5),
+                  Text(allToLocations.join(', ')),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
       }
     } catch (e) {
       setState(() {
@@ -757,4 +669,5 @@ class _LoadsScreenState extends State<LoadsScreen> {
       print('Error fetching data: $e');
     }
   }
+
 }
