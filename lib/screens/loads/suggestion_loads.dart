@@ -65,9 +65,14 @@ class SuggestionsContainer extends StatelessWidget {
                         SizedBox(height: 5),
                         Text(toLocations.join(', ')),
                         SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: onClose,
-                          child: Text('Close'),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: (){},
+                              child: Text('Accept'),
+                            ),
+                          ],
                         ),
                       ],
                     ),
