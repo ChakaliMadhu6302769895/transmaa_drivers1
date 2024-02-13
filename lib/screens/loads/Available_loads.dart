@@ -178,7 +178,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               ),
                               Padding(
                                 padding:
-                                    const EdgeInsets.only(right: 5, left: 5),
+                                const EdgeInsets.only(right: 5, left: 5),
                                 child: Icon(
                                   Icons.circle_outlined,
                                   color: Colors.transparent,
@@ -188,7 +188,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
+                                  CrossAxisAlignment.stretch,
                                   children: [
                                     Text(
                                       'From',
@@ -239,7 +239,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
+                                  CrossAxisAlignment.stretch,
                                   children: [
                                     Row(
                                       children: [
@@ -284,9 +284,8 @@ class _LoadsScreenState extends State<LoadsScreen> {
                             children: [
                               Padding(padding: EdgeInsets.only(left: 33)),
                               ElevatedButton(
-                                onPressed: isSearchEnabled
-                                    ? _searchButtonPressed
-                                    : null,
+                                onPressed:
+                                isSearchEnabled ? _searchButtonPressed : null,
                                 // Disable button if search is not enabled
                                 style: ElevatedButton.styleFrom(
                                   fixedSize: Size(275, 40),
@@ -347,230 +346,229 @@ class _LoadsScreenState extends State<LoadsScreen> {
                 child: isLoading
                     ? CircularProgressIndicator()
                     : documentData != null
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                    ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      "Available Loads : ",
+                      style: TextStyle(
+                          fontSize: 20, color: Colors.black),
+                    ),
+                    Divider(
+                      thickness: 2,
+                      color: Colors.brown,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 3,
+                            blurRadius: 5,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      padding: EdgeInsets.all(15),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 10),
+                          Row(
+                            crossAxisAlignment:CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                "Available Loads : ",
-                                style: TextStyle(
-                                    fontSize: 20, color: Colors.black),
-                              ),
-                              Divider(
-                                thickness: 2,
-                                color: Colors.brown,
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 3,
-                                      blurRadius: 5,
-                                      offset: Offset(0, 1),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'From Location:',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '${fromLocation ?? 'Not provided'}',
+                                      style: TextStyle(fontSize: 16),
                                     ),
                                   ],
                                 ),
-                                padding: EdgeInsets.all(15),
+                              ),
+                              VerticalDivider(
+                                color: Colors.black,
+                                thickness: 2,
+                              ),
+                              Expanded(
                                 child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
                                   children: [
-                                    SizedBox(height: 10),
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'From Location:',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text(
-                                                '${fromLocation ?? 'Not provided'}',
-                                                style: TextStyle(fontSize: 16),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        VerticalDivider(
-                                          color: Colors.black,
-                                          thickness: 2,
-                                        ),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Time:',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text(
-                                                '${documentData!['selectedTime']}',
-                                                style: TextStyle(fontSize: 16),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        VerticalDivider(
-                                          color: Colors.black,
-                                          thickness: 2,
-                                        ),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Goods Type:',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text(
-                                                '${documentData!['selectedGoodsType']}',
-                                                style: TextStyle(fontSize: 16),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 10),
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'To Location:',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text(
-                                                '${toLocation ?? 'Not provided'}',
-                                                style: TextStyle(fontSize: 16),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        VerticalDivider(
-                                          color: Colors.black,
-                                          thickness: 2,
-                                        ),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Date:',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text(
-                                                '${documentData!['selectedDate']}',
-                                                style: TextStyle(fontSize: 16),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        VerticalDivider(
-                                          color: Colors.black,
-                                          thickness: 2,
-                                        ),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Truck:',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text(
-                                                '${documentData!['selectedTruck']}',
-                                                style: TextStyle(fontSize: 16),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Divider(
-                                      thickness: 1,
-                                      color: Colors.black,
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          isAccepted = !isAccepted;
-                                        });
-                                        if (isAccepted) {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  HistoryScreen(documentData),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                      child: Text(
-                                        isAccepted ? 'Accepted' : 'Accept',
-                                        style: TextStyle(fontSize: 18),
+                                    Text(
+                                      'Time:',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
                                       ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '${documentData!['selectedTime']}',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              VerticalDivider(
+                                color: Colors.black,
+                                thickness: 2,
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Goods Type:',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '${documentData!['selectedGoodsType']}',
+                                      style: TextStyle(fontSize: 16),
                                     ),
                                   ],
                                 ),
                               ),
                             ],
-                          )
-                        : showSuggestions
-                            ? SuggestionsContainer(
-                                fromLocations: locationDetails,
-                                toLocations: locationDetails,
-                                onClose: () {
-                                  setState(() {
-                                    showSuggestions = false;
-                                  });
-                                },
-                              )
-                            : Text('No document data available'),
+                          ),
+                          SizedBox(height: 10),
+                          Row(
+                            crossAxisAlignment:
+                            CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'To Location:',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '${toLocation ?? 'Not provided'}',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              VerticalDivider(
+                                color: Colors.black,
+                                thickness: 2,
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Date:',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '${documentData!['selectedDate']}',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              VerticalDivider(
+                                color: Colors.black,
+                                thickness: 2,
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Truck:',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '${documentData!['selectedTruck']}',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          Divider(
+                            thickness: 1,
+                            color: Colors.black,
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                isAccepted = !isAccepted;
+                              });
+                              if (isAccepted) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        HistoryScreen(documentData),
+                                  ),
+                                );
+                              }
+                            },
+                            child: Text(
+                              isAccepted ? 'Accepted' : 'Accept',
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+                    : showSuggestions
+                    ? SuggestionsContainer(
+                  fromLocations: locationDetails,
+                  toLocations: locationDetails,
+                  onClose: () {
+                    setState(() {
+                      showSuggestions = false;
+                    });
+                  },
+                )
+                    : Text('No document data available'),
               )
             ],
           ),
@@ -611,7 +609,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
         // Matched locations found
         setState(() {
           documentData =
-              querySnapshot.docs.first.data() as Map<String, dynamic>?;
+          querySnapshot.docs.first.data() as Map<String, dynamic>?;
           isLoading = false;
         });
       } else {
@@ -657,3 +655,4 @@ class _LoadsScreenState extends State<LoadsScreen> {
     }
   }
 }
+
