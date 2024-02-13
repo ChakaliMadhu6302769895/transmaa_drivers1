@@ -159,7 +159,6 @@ class _LoadsScreenState extends State<LoadsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // From Location Input
                           Row(
                             children: [
                               Padding(
@@ -287,7 +286,6 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                 onPressed: isSearchEnabled
                                     ? _searchButtonPressed
                                     : null,
-                                // Disable button if search is not enabled
                                 style: ElevatedButton.styleFrom(
                                   fixedSize: Size(275, 40),
                                   primary: Colors.grey[400],
@@ -317,7 +315,10 @@ class _LoadsScreenState extends State<LoadsScreen> {
                         children: [
                           Padding(
                             padding: EdgeInsets.only(bottom: 50),
-                            child: Image.asset("assets/Vector.png"),
+                            child: GestureDetector(
+                              onTap: swapTextFields,
+                              child: Image.asset("assets/Vector.png"),
+                            ),
                           ),
                         ],
                       ),
@@ -563,7 +564,6 @@ class _LoadsScreenState extends State<LoadsScreen> {
     );
   }
 
-  // Method to update the state of the search button
   void updateSearchButtonState() {
     setState(() {
       isSearchEnabled = fromLocation != null &&
@@ -573,58 +573,47 @@ class _LoadsScreenState extends State<LoadsScreen> {
     });
   }
 
-  // Search Button Pressed Method
   void _searchButtonPressed() async {
     setState(() {
       isLoading = true;
       locationDetails.clear();
     });
-
     try {
-      // Initialize Firebase
       await Firebase.initializeApp();
-
-      // Fetch location details from Firebase
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('/pickup_requests') // Replace with your collection name
+          .collection('/pickup_requests')
           .where('fromLocation', isEqualTo: fromLocation)
           .where('toLocation', isEqualTo: toLocation)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        // Matched locations found
         setState(() {
           documentData =
               querySnapshot.docs.first.data() as Map<String, dynamic>?;
           isLoading = false;
         });
       } else {
-        // No matched locations found
         setState(() {
           isLoading = false;
-          documentData = null; // Clear documentData if no match found
-          showSuggestions = true; // Show suggestions
+          documentData = null;
+          showSuggestions = true;
         });
 
-        // Fetch all stored from location and to location data
         QuerySnapshot allLocationsSnapshot = await FirebaseFirestore.instance
-            .collection('/pickup_requests') // Replace with your collection name
+            .collection('/pickup_requests')
             .get();
 
         List<String> allFromLocations = [];
         List<String> allToLocations = [];
 
-        // Extract all from location and to location data
         allLocationsSnapshot.docs.forEach((doc) {
           allFromLocations.add(doc['fromLocation']);
           allToLocations.add(doc['toLocation']);
         });
 
-        // Remove duplicates
         allFromLocations = allFromLocations.toSet().toList();
         allToLocations = allToLocations.toSet().toList();
 
-        // Update locationDetails list
         setState(() {
           locationDetails = [
             ...allFromLocations,
@@ -639,5 +628,16 @@ class _LoadsScreenState extends State<LoadsScreen> {
       });
       print('Error fetching data: $e');
     }
+  }
+
+  void swapTextFields() {
+    String temp = fromLocationController.text;
+    fromLocationController.text = toLocationController.text;
+    toLocationController.text = temp;
+    setState(() {
+      fromLocation = fromLocationController.text;
+      toLocation = toLocationController.text;
+      updateSearchButtonState();
+    });
   }
 }
