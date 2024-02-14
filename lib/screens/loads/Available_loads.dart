@@ -26,6 +26,8 @@ class _LoadsScreenState extends State<LoadsScreen> {
   bool isSearchEnabled = false;
   bool isAccepted = false;
   bool showSuggestions = false;
+  List<Map<String, String>> locationPairs = []; // Add this line
+
 
   @override
   Widget build(BuildContext context) {
@@ -545,17 +547,19 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               ),
                             ],
                           )
-                        : showSuggestions
-                            ? SuggestionsContainer(
-                                fromLocations: locationDetails,
-                                toLocations: locationDetails,
-                                onClose: () {
-                                  setState(() {
-                                    showSuggestions = false;
-                                  });
-                                },
-                              )
-                            : Text('No document data available'),
+                :showSuggestions
+                    ? SuggestionsContainer(
+                  fromLocations: locationDetails,
+                  toLocations: locationDetails,
+                  onClose: () {
+                    setState(() {
+                      showSuggestions = false;
+                    });
+                  },
+                  locationPairs: locationPairs, // Ensure locationPairs is passed here
+                )
+                    : Text('No document data available'),
+
               )
             ],
           ),
@@ -577,7 +581,9 @@ class _LoadsScreenState extends State<LoadsScreen> {
     setState(() {
       isLoading = true;
       locationDetails.clear();
+      locationPairs.clear(); // Clear the previous suggestions
     });
+
     try {
       await Firebase.initializeApp();
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -589,7 +595,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
       if (querySnapshot.docs.isNotEmpty) {
         setState(() {
           documentData =
-              querySnapshot.docs.first.data() as Map<String, dynamic>?;
+          querySnapshot.docs.first.data() as Map<String, dynamic>?;
           isLoading = false;
         });
       } else {
@@ -611,14 +617,23 @@ class _LoadsScreenState extends State<LoadsScreen> {
           allToLocations.add(doc['toLocation']);
         });
 
-        allFromLocations = allFromLocations.toSet().toList();
-        allToLocations = allToLocations.toSet().toList();
+        // Filter locations to ensure they correspond as pairs
+        List<Map<String, String>> pairs = [];
+        for (int i = 0; i < allFromLocations.length; i++) {
+          String from = allFromLocations[i];
+          String to = allToLocations[i];
+
+          if (from != null && to != null) {
+            pairs.add({'from': from, 'to': to});
+          }
+        }
 
         setState(() {
           locationDetails = [
             ...allFromLocations,
             ...allToLocations,
           ];
+          locationPairs = pairs;
         });
       }
     } catch (e) {
@@ -629,6 +644,9 @@ class _LoadsScreenState extends State<LoadsScreen> {
       print('Error fetching data: $e');
     }
   }
+
+
+
 
   void swapTextFields() {
     String temp = fromLocationController.text;

@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 
 class SuggestionsContainer extends StatelessWidget {
-  final List<String> fromLocations;
-  final List<String> toLocations;
-  final VoidCallback onClose;
+  final List<Map<String, String>> locationPairs;
 
   const SuggestionsContainer({
     Key? key,
-    required this.fromLocations,
-    required this.toLocations,
-    required this.onClose,
+    required this.locationPairs, required List<String> fromLocations, required List<String> toLocations, required Null Function() onClose,
   }) : super(key: key);
 
   @override
@@ -43,46 +39,66 @@ class SuggestionsContainer extends StatelessWidget {
           ),
           padding: EdgeInsets.all(15),
           child: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Available From Locations:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 5),
-                        Text(fromLocations.join(', ')),
-                        SizedBox(height: 10),
-                        Text(
-                          'Available To Locations:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 5),
-                        Text(toLocations.join(', ')),
-                        SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ElevatedButton(
-                              onPressed: (){},
-                              child: Text('Accept'),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ],
+            children: _buildSuggestionWidgets(),
           ),
         ),
       ],
     );
   }
+
+  List<Widget> _buildSuggestionWidgets() {
+    List<Widget> suggestionWidgets = [];
+
+    for (int i = 0; i < locationPairs.length; i++) {
+      final fromLocation = locationPairs[i]['from'];
+      final toLocation = locationPairs[i]['to'];
+
+      suggestionWidgets.add(Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'From Location : $fromLocation',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 10),
+          Text(
+            'To Location : $toLocation',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Divider(
+            thickness: 1,
+            color: Colors.black,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {},
+                child: Text('Accept'),
+              ),
+            ],
+          ),
+          SizedBox(height: 20),
+        ],
+      ));
+    }
+    return suggestionWidgets;
+  }
+}
+
+// Example usage
+void main() {
+  List<Map<String, String>> locationPairs = [
+    {'from': 'Location A', 'to': 'Location B'},
+    {'from': 'Location C', 'to': 'Location D'},
+    // Add more location pairs as needed
+  ];
+
+  runApp(MaterialApp(
+    home: Scaffold(
+      body: SuggestionsContainer(
+        locationPairs: locationPairs, fromLocations: [], toLocations: [], onClose: () {  },
+      ),
+    ),
+  ));
 }
