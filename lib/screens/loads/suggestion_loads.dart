@@ -24,23 +24,8 @@ class SuggestionsContainer extends StatelessWidget {
         SizedBox(
           height: 10,
         ),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
-                spreadRadius: 3,
-                blurRadius: 5,
-                offset: Offset(0, 1),
-              ),
-            ],
-          ),
-          padding: EdgeInsets.all(15),
-          child: Column(
-            children: _buildSuggestionWidgets(),
-          ),
+        Column(
+          children: _buildSuggestionWidgets(),
         ),
       ],
     );
@@ -53,33 +38,45 @@ class SuggestionsContainer extends StatelessWidget {
       final fromLocation = locationPairs[i]['from'];
       final toLocation = locationPairs[i]['to'];
 
-      suggestionWidgets.add(Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'From Location : $fromLocation',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10),
-          Text(
-            'To Location : $toLocation',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          Divider(
-            thickness: 1,
-            color: Colors.black,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () {},
-                child: Text('Accept'),
-              ),
-            ],
-          ),
-          SizedBox(height: 20),
-        ],
+      suggestionWidgets.add(Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 3,
+              blurRadius: 5,
+              offset: Offset(0, 1),
+            ),
+          ],
+        ),
+        padding: EdgeInsets.all(15),
+        margin: EdgeInsets.symmetric(vertical: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'From Location : $fromLocation',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'To Location : $toLocation',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Divider(thickness: 1,color: Colors.black,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {},
+                  child: Text('Accept'),
+                ),
+              ],
+            ),
+          ],
+        ),
       ));
     }
     return suggestionWidgets;
