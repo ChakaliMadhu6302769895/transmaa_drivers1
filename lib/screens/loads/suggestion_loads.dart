@@ -56,15 +56,17 @@ class SuggestionsContainer extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'From Location : $fromLocation',
+            Text('From Location :',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
+            SizedBox(height: 5,),
+            Text('$fromLocation'),
             SizedBox(height: 10),
-            Text(
-              'To Location : $toLocation',
+            Text('To Location :',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
+            SizedBox(height: 5,),
+            Text('$toLocation'),
             Divider(thickness: 1,color: Colors.black,),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
