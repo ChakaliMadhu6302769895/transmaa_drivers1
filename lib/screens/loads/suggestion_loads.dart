@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class SuggestionsContainer extends StatelessWidget {
   final List<Map<String, String>> locationPairs;
   final List<String> fromLocations;
   final List<String> toLocations;
-  final String selectedDate;
+  final String selectedDate; // Add selectedDate parameter here
   final String selectedTime;
   final String selectedGoodsType;
   final String selectedTruck;
@@ -24,166 +26,181 @@ class SuggestionsContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          "Suggested Loads : ",
-          style: TextStyle(fontSize: 20, color: Colors.black),
-        ),
-        Divider(
-          thickness: 2,
-          color: Colors.brown,
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Column(
-          children: _buildSuggestionWidgets(),
-        ),
-      ],
+    return FutureBuilder<QuerySnapshot>(
+      future: FirebaseFirestore.instance.collection('pickup_requests').get(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+        final suggestions = snapshot.data!.docs.map((doc) {
+          final fromLocation = doc['fromLocation'];
+          final toLocation = doc['toLocation'];
+          final selectedDateTimestamp = doc['selectedDate'] as Timestamp;
+          final selectedDate = selectedDateTimestamp.toDate();
+          final formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+          final selectedTime = doc['selectedTime'];
+          final selectedGoodsType = doc['selectedGoodsType'];
+          final selectedTruck = {
+            'name': doc['selectedTruck']['name'],
+            'weightCapacity': doc['selectedTruck']['weightCapacity'].toString(),
+          };
+
+
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 3,
+                  blurRadius: 5,
+                  offset: Offset(0, 1),
+                ),
+              ],
+            ),
+            padding: EdgeInsets.all(15),
+            margin: EdgeInsets.symmetric(vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'From Location:',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 5),
+                          Text('$fromLocation'),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Date:',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 5),
+                          Text('$formattedDate'),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Goods Type:',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 5),
+                          Text('$selectedGoodsType'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'To Location:',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 5),
+                          Text('$toLocation'),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Time:',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 5),
+                          Text('$selectedTime'),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Truck:',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 5),
+                          Text('${selectedTruck['name']} (Capacity: ${selectedTruck['weightCapacity']}kg)'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Divider(
+                  thickness: 1,
+                  color: Colors.black,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: onClose,
+                      child: Text('Accept'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }).toList();
+
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                "Suggested Loads : ",
+                style: TextStyle(fontSize: 20, color: Colors.black),
+              ),
+              Divider(
+                thickness: 2,
+                color: Colors.brown,
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Column(
+                children: suggestions,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
-
-  List<Widget> _buildSuggestionWidgets() {
-    List<Widget> suggestionWidgets = [];
-
-    for (int i = 0; i < locationPairs.length; i++) {
-      final fromLocation = locationPairs[i]['from'];
-      final toLocation = locationPairs[i]['to'];
-
-      suggestionWidgets.add(Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 3,
-              blurRadius: 5,
-              offset: Offset(0, 1),
-            ),
-          ],
-        ),
-        padding: EdgeInsets.all(15),
-        margin: EdgeInsets.symmetric(vertical: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'From Location:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 5),
-                      Text('$fromLocation'),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Date:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 5),
-                      Text('$selectedDate'),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Goods Type:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 5),
-                      Text('$selectedGoodsType'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'To Location:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 5),
-                      Text('$toLocation'),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Time:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 5),
-                      Text('$selectedTime'),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Truck:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 5),
-                      Text('$selectedTruck'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Divider(
-              thickness: 1,
-              color: Colors.black,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: onClose,
-                  child: Text('Accept'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ));
-    }
-    return suggestionWidgets;
-  }
-
 }
-
 
 List<Map<String, String>> locationPairs = [
   {'from': 'Location A', 'to': 'Location B'},
   {'from': 'Location C', 'to': 'Location D'},
-  // Add more location pairs as needed
 ];
 
 // Other example data
@@ -195,6 +212,7 @@ String selectedTruck = 'Truck A';
 
 // Usage of SuggestionsContainer widget
 class MyWidget extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -211,5 +229,3 @@ class MyWidget extends StatelessWidget {
     );
   }
 }
-
-

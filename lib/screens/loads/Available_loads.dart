@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import 'package:transmaa_drivers1/screens/loads/suggestion_loads.dart';
 
 import '../appbar_icons/helpline_screen.dart';
@@ -290,7 +291,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                           SizedBox(height: 20),
                           Row(
                             children: [
-                              Padding(padding: EdgeInsets.only(left: 33)),
+                              Padding(padding: EdgeInsets.only(left: 28)),
                               ElevatedButton(
                                 onPressed: isSearchEnabled
                                     ? _searchButtonPressed
@@ -419,7 +420,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                   CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Time:',
+                                      'Date:',
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
@@ -427,7 +428,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                     ),
                                     SizedBox(height: 5),
                                     Text(
-                                      '${documentData!['selectedTime']}',
+                                      '${formatDate(documentData!['selectedDate'])}',
                                       style: TextStyle(fontSize: 16),
                                     ),
                                   ],
@@ -486,7 +487,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                   CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Date:',
+                                      'Time:',
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
@@ -494,7 +495,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                     ),
                                     SizedBox(height: 5),
                                     Text(
-                                      '${documentData!['selectedDate']}',
+                                      '${documentData!['selectedTime']}',
                                       style: TextStyle(fontSize: 16),
                                     ),
                                   ],
@@ -654,9 +655,6 @@ class _LoadsScreenState extends State<LoadsScreen> {
     }
   }
 
-
-
-
   void swapTextFields() {
     String temp = fromLocationController.text;
     fromLocationController.text = toLocationController.text;
@@ -667,5 +665,11 @@ class _LoadsScreenState extends State<LoadsScreen> {
       updateSearchButtonState();
     });
   }
-}
 
+  String formatDate(Timestamp timestamp) {
+    DateTime dateTime = timestamp.toDate();
+    String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
+    return formattedDate;
+  }
+
+}
