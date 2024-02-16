@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
-class SuggestionsContainer extends StatelessWidget {
+import '../history_details/history_screen.dart';
+
+
+class SuggestionsContainer extends StatefulWidget {
   final List<Map<String, String>> locationPairs;
   final List<String> fromLocations;
   final List<String> toLocations;
-  final String selectedDate; // Add selectedDate parameter here
+  final String selectedDate;
   final String selectedTime;
   final String selectedGoodsType;
   final String selectedTruck;
@@ -25,9 +28,16 @@ class SuggestionsContainer extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<SuggestionsContainer> createState() => _SuggestionsContainerState();
+}
+
+class _SuggestionsContainerState extends State<SuggestionsContainer> {
+  Set<String> acceptedSuggestions = Set();
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder<QuerySnapshot>(
-      future: FirebaseFirestore.instance.collection('pickup_requests').get(),
+      future: FirebaseFirestore.instance.collection('Transmaa_accepted_orders').get(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -47,7 +57,6 @@ class SuggestionsContainer extends StatelessWidget {
             'name': doc['selectedTruck']['name'],
             'weightCapacity': doc['selectedTruck']['weightCapacity'].toString(),
           };
-
 
           return Container(
             decoration: BoxDecoration(
@@ -148,7 +157,8 @@ class SuggestionsContainer extends StatelessWidget {
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           SizedBox(height: 5),
-                          Text('${selectedTruck['name']} (Capacity: ${selectedTruck['weightCapacity']}kg)'),
+                          Text(
+                              '${selectedTruck['name']} (Capacity: ${selectedTruck['weightCapacity']}kg)'),
                         ],
                       ),
                     ),
@@ -162,8 +172,47 @@ class SuggestionsContainer extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
-                      onPressed: onClose,
-                      child: Text('Accept'),
+                      onPressed: () {
+                        setState(() {
+                          acceptedSuggestions.add(doc.id);
+                        });
+                        widget.onClose();
+                        // Update the status in Firestore or add a new document if it does not exist
+                        FirebaseFirestore.instance
+                            .collection('Drivers Accepted')
+                            .doc(doc.id)
+                            .set({
+                          'status': 'Accepted',
+                          'fromLocation': fromLocation,
+                          'toLocation': toLocation,
+                          'selectedDate': selectedDate,
+                          'selectedTime': selectedTime,
+                          'selectedGoodsType': selectedGoodsType,
+                          'selectedTruck': selectedTruck,
+                        }, SetOptions(merge: true))
+                            .then((_) {
+                          // Navigate to HistoryScreen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HistoryScreen({
+                                'fromLocation': fromLocation,
+                                'toLocation': toLocation,
+                                'selectedDate': selectedDate,
+                                'selectedTime': selectedTime,
+                                'selectedGoodsType': selectedGoodsType,
+                                'selectedTruck': selectedTruck,
+                              }),
+                            ),
+                          );
+                        })
+                            .catchError((error) {
+                          // Handle error
+                          print('Failed to update status: $error');
+                        });
+                      },
+
+                      child: Text(acceptedSuggestions.contains(doc.id) ? 'Accepted' : 'Accept'),
                     ),
                   ],
                 ),
@@ -203,16 +252,18 @@ List<Map<String, String>> locationPairs = [
   {'from': 'Location C', 'to': 'Location D'},
 ];
 
-// Other example data
-List<String> locationDetails = ['Location A', 'Location B', 'Location C', 'Location D'];
+List<String> locationDetails = [
+  'Location A',
+  'Location B',
+  'Location C',
+  'Location D'
+];
 String selectedDate = '2022-02-16';
 String selectedTime = '14:30';
 String selectedGoodsType = 'Furniture';
 String selectedTruck = 'Truck A';
 
-// Usage of SuggestionsContainer widget
 class MyWidget extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -229,3 +280,6 @@ class MyWidget extends StatelessWidget {
     );
   }
 }
+
+
+

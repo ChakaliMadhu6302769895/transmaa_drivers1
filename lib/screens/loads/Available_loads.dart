@@ -1,6 +1,3 @@
-
-
-
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -533,30 +530,22 @@ class _LoadsScreenState extends State<LoadsScreen> {
                           ElevatedButton(
                             onPressed: () {
                               setState(() {
-                                isAccepted = !isAccepted;
+                                isAccepted = true;
                               });
-                              if (isAccepted) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        HistoryScreen(documentData),
-                                  ),
-                                );
-                              }
+                              _acceptButtonPressed(); // Call _acceptButtonPressed
                             },
                             child: Text(
                               isAccepted ? 'Accepted' : 'Accept',
                               style: TextStyle(fontSize: 18),
                             ),
                           ),
+
                         ],
                       ),
                     ),
                   ],
                 )
-
-                    :showSuggestions
+                    : showSuggestions
                     ? SuggestionsContainer(
                   fromLocations: locationDetails,
                   toLocations: locationDetails,
@@ -565,11 +554,9 @@ class _LoadsScreenState extends State<LoadsScreen> {
                   selectedTime: selectedTime,
                   selectedGoodsType: selectedGoodsType,
                   selectedTruck: selectedTruck,
-                  onClose: () {  },
+                  onClose: () {},
                 )
-
                     : Text('No document data available'),
-
               )
             ],
           ),
@@ -597,7 +584,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
     try {
       await Firebase.initializeApp();
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('/pickup_requests')
+          .collection('/Transmaa_accepted_orders')
           .where('fromLocation', isEqualTo: fromLocation)
           .where('toLocation', isEqualTo: toLocation)
           .get();
@@ -616,7 +603,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
         });
 
         QuerySnapshot allLocationsSnapshot = await FirebaseFirestore.instance
-            .collection('/pickup_requests')
+            .collection('/Transmaa_accepted_orders ')
             .get();
 
         List<String> allFromLocations = [];
@@ -672,4 +659,35 @@ class _LoadsScreenState extends State<LoadsScreen> {
     return formattedDate;
   }
 
+  void _acceptButtonPressed() async {
+    try {
+      await Firebase.initializeApp();
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+      // Add the accepted load to the 'Drivers Accepted' collection
+      await firestore.collection('Drivers Accepted').add({
+        'fromLocation': documentData!['fromLocation'],
+        'toLocation': documentData!['toLocation'],
+        'selectedDate': documentData!['selectedDate'],
+        'selectedTime': documentData!['selectedTime'],
+        'selectedGoodsType': documentData!['selectedGoodsType'],
+        'selectedTruck': documentData!['selectedTruck'],
+        'status': 'Accepted',
+      });
+
+      setState(() {
+        isAccepted = true; // Update the UI to show 'Accepted'
+      });
+
+      // Navigate to the history screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HistoryScreen(documentData),
+        ),
+      );
+    } catch (e) {
+      print('Error accepting load: $e');
+    }
+  }
 }
