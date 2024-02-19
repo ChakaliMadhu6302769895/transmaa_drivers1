@@ -177,7 +177,7 @@ class _SuggestionsContainerState extends State<SuggestionsContainer> {
                           acceptedSuggestions.add(doc.id);
                         });
                         widget.onClose();
-                        // Update the status in Firestore or add a new document if it does not exist
+
                         FirebaseFirestore.instance
                             .collection('Drivers Accepted')
                             .doc(doc.id)
@@ -220,6 +220,8 @@ class _SuggestionsContainerState extends State<SuggestionsContainer> {
             ),
           );
         }).toList();
+
+
 
         return SingleChildScrollView(
           child: Column(
@@ -280,6 +282,3 @@ class MyWidget extends StatelessWidget {
     );
   }
 }
-
-
-

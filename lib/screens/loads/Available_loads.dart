@@ -664,11 +664,15 @@ class _LoadsScreenState extends State<LoadsScreen> {
       await Firebase.initializeApp();
       FirebaseFirestore firestore = FirebaseFirestore.instance;
 
+      // Convert selectedDate from Timestamp to DateTime
+      Timestamp selectedDateTimestamp = documentData!['selectedDate'] as Timestamp;
+      DateTime selectedDate = selectedDateTimestamp.toDate();
+
       // Add the accepted load to the 'Drivers Accepted' collection
       await firestore.collection('Drivers Accepted').add({
         'fromLocation': documentData!['fromLocation'],
         'toLocation': documentData!['toLocation'],
-        'selectedDate': documentData!['selectedDate'],
+        'selectedDate': selectedDate,
         'selectedTime': documentData!['selectedTime'],
         'selectedGoodsType': documentData!['selectedGoodsType'],
         'selectedTruck': documentData!['selectedTruck'],
@@ -683,11 +687,17 @@ class _LoadsScreenState extends State<LoadsScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => HistoryScreen(documentData),
+          builder: (context) => HistoryScreen({
+            ...documentData!,
+            'selectedDate': selectedDate, // Replace selectedDate with DateTime
+          }),
         ),
       );
     } catch (e) {
       print('Error accepting load: $e');
     }
   }
+
+
+
 }
