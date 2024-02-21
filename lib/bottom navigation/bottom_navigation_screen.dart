@@ -59,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
       case 1:
         return HistoryScreen(documentData);
       case 2:
-        return ProfileScreen();
+        return Profile();
       default:
         return Container(); // Handle an invalid index gracefully
     }

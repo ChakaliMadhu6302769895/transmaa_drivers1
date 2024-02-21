@@ -1,24 +1,28 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:transmaa_drivers1/screens/bottom%20navigation/bottom_navigation_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import 'firebase_options.dart';
+import 'login_registration/driver_login.dart';
 
-void main() async {
+
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((value){
+  });
   await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform);
-
-  runApp(const MyApp());
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp( MyApp());
 }
-
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key});
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
+     title: "Driver",
       debugShowCheckedModeBanner: false,
-      home: MyHomePage(),
+      home:LoginScreen(phoneNumber: '',),
     );
   }
 }

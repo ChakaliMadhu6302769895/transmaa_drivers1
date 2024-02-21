@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import 'package:transmaa_drivers1/screens/loads/suggestion_loads.dart';
-
+import 'package:transmaa_drivers1/loads/suggestion_loads.dart';
 import '../appbar_icons/helpline_screen.dart';
 import '../appbar_icons/notification_screen.dart';
 import '../history_details/history_screen.dart';
