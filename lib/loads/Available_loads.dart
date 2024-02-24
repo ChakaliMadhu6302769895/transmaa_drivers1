@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -183,7 +184,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               ),
                               Padding(
                                 padding:
-                                const EdgeInsets.only(right: 5, left: 5),
+                                    const EdgeInsets.only(right: 5, left: 5),
                                 child: Icon(
                                   Icons.circle_outlined,
                                   color: Colors.transparent,
@@ -193,7 +194,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment:
-                                  CrossAxisAlignment.stretch,
+                                      CrossAxisAlignment.stretch,
                                   children: [
                                     Text(
                                       'From',
@@ -244,7 +245,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment:
-                                  CrossAxisAlignment.stretch,
+                                      CrossAxisAlignment.stretch,
                                   children: [
                                     Row(
                                       children: [
@@ -354,208 +355,207 @@ class _LoadsScreenState extends State<LoadsScreen> {
                 child: isLoading
                     ? CircularProgressIndicator()
                     : documentData != null
-                    ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      "Available Loads : ",
-                      style: TextStyle(
-                          fontSize: 20, color: Colors.black),
-                    ),
-                    Divider(
-                      thickness: 2,
-                      color: Colors.brown,
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 3,
-                            blurRadius: 5,
-                            offset: Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      padding: EdgeInsets.all(15),
-                      child: Column(
-                        children: [
-                          SizedBox(height: 10),
-                          Row(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'From Location:',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      '${fromLocation ?? 'Not provided'}',
-                                      style: TextStyle(fontSize: 16),
+                              Text(
+                                "Available Loads : ",
+                                style: TextStyle(
+                                    fontSize: 20, color: Colors.black),
+                              ),
+                              Divider(
+                                thickness: 2,
+                                color: Colors.brown,
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 3,
+                                      blurRadius: 5,
+                                      offset: Offset(0, 1),
                                     ),
                                   ],
                                 ),
-                              ),
-                              Expanded(
+                                padding: EdgeInsets.all(15),
                                 child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      'Date:',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
+                                    SizedBox(height: 10),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'From Location:',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: 5),
+                                              Text(
+                                                '${fromLocation ?? 'Not provided'}',
+                                                style: TextStyle(fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Date:',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: 5),
+                                              Text(
+                                                '${formatDate(documentData!['selectedDate'])}',
+                                                style: TextStyle(fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Goods Type:',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: 5),
+                                              Text(
+                                                '${documentData!['selectedGoodsType']}',
+                                                style: TextStyle(fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'To Location:',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: 5),
+                                              Text(
+                                                '${toLocation ?? 'Not provided'}',
+                                                style: TextStyle(fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Time:',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: 5),
+                                              Text(
+                                                '${documentData!['selectedTime']}',
+                                                style: TextStyle(fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Truck:',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: 5),
+                                              Text(
+                                                '${documentData!['selectedTruck']}',
+                                                style: TextStyle(fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Divider(
+                                      thickness: 1,
+                                      color: Colors.black,
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          isAccepted = true;
+                                        });
+                                        _acceptButtonPressed(); // Call _acceptButtonPressed
+                                      },
+                                      child: Text(
+                                        isAccepted ? 'Accepted' : 'Accept',
+                                        style: TextStyle(fontSize: 18),
                                       ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      '${formatDate(documentData!['selectedDate'])}',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Goods Type:',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      '${documentData!['selectedGoodsType']}',
-                                      style: TextStyle(fontSize: 16),
                                     ),
                                   ],
                                 ),
                               ),
                             ],
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'To Location:',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      '${toLocation ?? 'Not provided'}',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Time:',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      '${documentData!['selectedTime']}',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Truck:',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      '${documentData!['selectedTruck']}',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          Divider(
-                            thickness: 1,
-                            color: Colors.black,
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                isAccepted = true;
-                              });
-                              _acceptButtonPressed(); // Call _acceptButtonPressed
-                            },
-                            child: Text(
-                              isAccepted ? 'Accepted' : 'Accept',
-                              style: TextStyle(fontSize: 18),
-                            ),
-                          ),
-
-                        ],
-                      ),
-                    ),
-                  ],
-                )
-                    : showSuggestions
-                    ? SuggestionsContainer(
-                  fromLocations: locationDetails,
-                  toLocations: locationDetails,
-                  locationPairs: locationPairs,
-                  selectedDate: selectedDate,
-                  selectedTime: selectedTime,
-                  selectedGoodsType: selectedGoodsType,
-                  selectedTruck: selectedTruck,
-                  onClose: () {},
-                )
-                    : Text('No document data available'),
+                          )
+                        : showSuggestions
+                            ? SuggestionsContainer(
+                                fromLocations: locationDetails,
+                                toLocations: locationDetails,
+                                locationPairs: locationPairs,
+                                selectedDate: selectedDate,
+                                selectedTime: selectedTime,
+                                selectedGoodsType: selectedGoodsType,
+                                selectedTruck: selectedTruck,
+                                onClose: () {},
+                              )
+                            : Text('No document data available'),
               )
             ],
           ),
@@ -591,7 +591,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
       if (querySnapshot.docs.isNotEmpty) {
         setState(() {
           documentData =
-          querySnapshot.docs.first.data() as Map<String, dynamic>?;
+              querySnapshot.docs.first.data() as Map<String, dynamic>?;
           isLoading = false;
         });
       } else {
@@ -663,20 +663,50 @@ class _LoadsScreenState extends State<LoadsScreen> {
       await Firebase.initializeApp();
       FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-      // Convert selectedDate from Timestamp to DateTime
+
       Timestamp selectedDateTimestamp = documentData!['selectedDate'] as Timestamp;
       DateTime selectedDate = selectedDateTimestamp.toDate();
 
-      // Add the accepted load to the 'Drivers Accepted' collection
-      await firestore.collection('Drivers Accepted').add({
+      // Add the accepted load to the 'DriversAcceptedOrders' collection
+      DocumentReference acceptedOrderRef = await firestore.collection('DriversAcceptedOrders').add({
         'fromLocation': documentData!['fromLocation'],
         'toLocation': documentData!['toLocation'],
-        'selectedDate': selectedDate,
+        'selectedDate': documentData!['selectedDate'],
         'selectedTime': documentData!['selectedTime'],
         'selectedGoodsType': documentData!['selectedGoodsType'],
         'selectedTruck': documentData!['selectedTruck'],
         'status': 'Accepted',
       });
+
+      setState(() {
+        isAccepted = true; // Update the UI to show 'Accepted'
+      });
+      // Get the document ID of the newly added document in 'DriversAcceptedOrders' collection
+      String? documentId = acceptedOrderRef.id;
+      print("Document ID: $documentId");
+
+      if (documentId != null) {
+        // Query the 'Transmaa_accepted_orders' collection to find the document matching the current data
+        QuerySnapshot querySnapshot = await firestore.collection('Transmaa_accepted_orders')
+            .where('fromLocation', isEqualTo: documentData!['fromLocation'])
+            .where('toLocation', isEqualTo: documentData!['toLocation'])
+            .where('selectedDate', isEqualTo: documentData!['selectedDate'])
+            .where('selectedTime', isEqualTo: documentData!['selectedTime'])
+            .where('selectedGoodsType', isEqualTo: documentData!['selectedGoodsType'])
+            .where('selectedTruck', isEqualTo: documentData!['selectedTruck'])
+            .get();
+
+        // Check if any matching documents found
+        if (querySnapshot.docs.isNotEmpty) {
+          // Assuming there's only one matching document, get its reference and delete it
+          await querySnapshot.docs.first.reference.delete();
+          print("Document deleted from Transmaa_accepted_orders.");
+        } else {
+          print("No matching document found in Transmaa_accepted_orders.");
+        }
+      } else {
+        print("Document ID is null.");
+      }
 
       setState(() {
         isAccepted = true; // Update the UI to show 'Accepted'
@@ -692,11 +722,10 @@ class _LoadsScreenState extends State<LoadsScreen> {
           }),
         ),
       );
-    } catch (e) {
+
+    } catch (e, stackTrace) {
       print('Error accepting load: $e');
+      print('StackTrace: $stackTrace');
     }
   }
-
-
-
 }

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-
 import '../history_details/history_screen.dart';
-
 
 class SuggestionsContainer extends StatefulWidget {
   final List<Map<String, String>> locationPairs;
@@ -14,7 +12,6 @@ class SuggestionsContainer extends StatefulWidget {
   final String selectedGoodsType;
   final String selectedTruck;
   final void Function() onClose;
-
   const SuggestionsContainer({
     Key? key,
     required this.locationPairs,
@@ -34,6 +31,43 @@ class SuggestionsContainer extends StatefulWidget {
 class _SuggestionsContainerState extends State<SuggestionsContainer> {
   Set<String> acceptedSuggestions = Set();
 
+  Future<void> _acceptButtonPressed(String suggestionId, Map<String, dynamic> suggestionData) async {
+    try {
+      // Add the accepted suggestion to 'drivers accepted orders' collection
+      await FirebaseFirestore.instance.collection('DriversAcceptedOrders').add({
+        'fromLocation': suggestionData['fromLocation'],
+        'toLocation': suggestionData['toLocation'],
+        'selectedDate': suggestionData['selectedDate'],
+        'selectedTime': suggestionData['selectedTime'],
+        'selectedGoodsType': suggestionData['selectedGoodsType'],
+        'selectedTruck': suggestionData['selectedTruck'],
+        'status': 'Accepted',
+        // 'driverName': 'Accepted',
+        // 'PhoneNumber': 'Accepted', // corrected 'PhoneNuber' to 'PhoneNumber'
+      });
+
+      // Delete the accepted suggestion from 'Transmaa_accepted_orders' collection
+      await FirebaseFirestore.instance.collection('Transmaa_accepted_orders').doc(suggestionId).delete();
+
+      // Navigate to the history screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HistoryScreen({
+            'fromLocation': suggestionData['fromLocation'],
+            'toLocation': suggestionData['toLocation'],
+            'selectedDate': suggestionData['selectedDate'],
+            'selectedTime': suggestionData['selectedTime'],
+            'selectedGoodsType': suggestionData['selectedGoodsType'],
+            'selectedTruck': suggestionData['selectedTruck'],
+          }),
+        ),
+      );
+    } catch (e) {
+      print('Error accepting suggestion: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<QuerySnapshot>(
@@ -46,6 +80,7 @@ class _SuggestionsContainerState extends State<SuggestionsContainer> {
           return Center(child: Text('Error: ${snapshot.error}'));
         }
         final suggestions = snapshot.data!.docs.map((doc) {
+          final suggestionId = doc.id;
           final fromLocation = doc['fromLocation'];
           final toLocation = doc['toLocation'];
           final selectedDateTimestamp = doc['selectedDate'] as Timestamp;
@@ -173,46 +208,16 @@ class _SuggestionsContainerState extends State<SuggestionsContainer> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        setState(() {
-                          acceptedSuggestions.add(doc.id);
-                        });
-                        widget.onClose();
-
-                        FirebaseFirestore.instance
-                            .collection('Drivers Accepted')
-                            .doc(doc.id)
-                            .set({
-                          'status': 'Accepted',
+                        _acceptButtonPressed(suggestionId, {
                           'fromLocation': fromLocation,
                           'toLocation': toLocation,
                           'selectedDate': selectedDate,
                           'selectedTime': selectedTime,
                           'selectedGoodsType': selectedGoodsType,
                           'selectedTruck': selectedTruck,
-                        }, SetOptions(merge: true))
-                            .then((_) {
-                          // Navigate to HistoryScreen
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HistoryScreen({
-                                'fromLocation': fromLocation,
-                                'toLocation': toLocation,
-                                'selectedDate': selectedDate,
-                                'selectedTime': selectedTime,
-                                'selectedGoodsType': selectedGoodsType,
-                                'selectedTruck': selectedTruck,
-                              }),
-                            ),
-                          );
-                        })
-                            .catchError((error) {
-                          // Handle error
-                          print('Failed to update status: $error');
                         });
                       },
-
-                      child: Text(acceptedSuggestions.contains(doc.id) ? 'Accepted' : 'Accept'),
+                      child: Text('Accept'),
                     ),
                   ],
                 ),
@@ -220,8 +225,6 @@ class _SuggestionsContainerState extends State<SuggestionsContainer> {
             ),
           );
         }).toList();
-
-
 
         return SingleChildScrollView(
           child: Column(

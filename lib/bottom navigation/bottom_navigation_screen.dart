@@ -6,7 +6,7 @@ import '../loads/Available_loads.dart';
 import 'package:bottom_bar/bottom_bar.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key});
+  const MyHomePage({Key? key, required String phoneNumber});
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
