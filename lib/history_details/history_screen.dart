@@ -36,7 +36,7 @@ class HistoryScreen extends StatelessWidget {
                       padding: const EdgeInsets.only(left: 20, bottom: 5),
                       child: Container(
                         child: Image.asset(
-                          'assets/Final logo.png',
+                          'assets/Finallogo.png',
                           fit: BoxFit.cover,
                           height: 45,
                           width: 161,
