@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -5,6 +6,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:transmaa_drivers1/loads/suggetion_loads.dart';
 import '../history_details/history_screen.dart';
+import 'package:http/http.dart' as http;
+
+class PlaceSuggestion {
+  final String displayName;
+
+  PlaceSuggestion({
+    required this.displayName,
+  });
+
+  factory PlaceSuggestion.fromJson(Map<String, dynamic> json) {
+    return PlaceSuggestion(
+      displayName: json['display_name'],
+    );
+  }
+}
 
 class LoadsScreen extends StatefulWidget {
   const LoadsScreen({Key? key});
@@ -18,27 +34,27 @@ class _LoadsScreenState extends State<LoadsScreen> {
   TextEditingController toLocationController = TextEditingController();
 
   User? driver;
-
   Map<String, dynamic>? documentData;
-  String? fromLocation;
-  String? toLocation;
+  String fromLocation = '';
+  String toLocation = '';
   List<String> locationDetails = [];
   bool isLoading = false;
   bool isSearchEnabled = false;
   bool isAccepted = false;
   bool showSuggestions = false;
   List<Map<String, String>> locationPairs = [];
-
   String selectedDate = '';
   String selectedTime = '';
   String selectedGoodsType = '';
   String selectedTruck = '';
-  String currentUser = ''; // State variable to hold current user's name
+  String currentUser = '';
+  List<PlaceSuggestion> fromLocationSuggestions = [];
+  List<PlaceSuggestion> toLocationSuggestions = [];
 
   @override
   void initState() {
     super.initState();
-    fetchDriverData(); // Fetch current user's name when the widget initializes
+    fetchDriverData();
   }
 
   Future<void> fetchDriverData() async {
@@ -82,6 +98,25 @@ class _LoadsScreenState extends State<LoadsScreen> {
     }
   }
 
+  Future<List<PlaceSuggestion>> fetchFromSuggestions(String query) async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://nominatim.openstreetmap.org/search?q=$query&format=json&viewbox=68.1,6.5,97.4,35.5&bounded=1&countrycodes=in'),
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        List<PlaceSuggestion> suggestions = data.map((json) => PlaceSuggestion.fromJson(json)).toList();
+        return suggestions;
+      } else {
+        throw Exception('Failed to load suggestions');
+      }
+    } catch (e) {
+      print('Error fetching suggestions: $e');
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,7 +125,6 @@ class _LoadsScreenState extends State<LoadsScreen> {
         child: Container(
           child: Column(
             children: [
-              // Greetings Section
               SizedBox(height: 10),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,196 +140,237 @@ class _LoadsScreenState extends State<LoadsScreen> {
                   ),
                 ],
               ),
-              // Input Section
               SizedBox(height: 10),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 3,
-                      blurRadius: 5,
-                      offset: Offset(0, 1),
+              Stack(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    margin: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 3,
+                          blurRadius: 5,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                height: 260,
-                width: 370,
-                padding: EdgeInsets.all(16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 20),
-                                child: Container(
-                                  width: 18,
-                                  height: 18,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.black,
-                                      width: 4,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding:
-                                const EdgeInsets.only(right: 5, left: 5),
-                                child: Icon(
-                                  Icons.circle_outlined,
-                                  color: Colors.transparent,
-                                  size: 1,
-                                ),
-                              ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.stretch,
-                                  children: [
-                                    Text(
-                                      'From',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    TextField(
-                                      controller: fromLocationController,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          fromLocation = value;
-                                          updateSearchButtonState();
-                                        });
-                                      },
-                                      decoration: InputDecoration(
-                                        hintText: 'Load it....',
-                                        border: OutlineInputBorder(),
-                                        contentPadding: EdgeInsets.symmetric(
-                                          horizontal: 15,
-                                          vertical: 10,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          // To Location Input
-                          SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 20),
-                                child: Icon(
-                                  Icons.location_on_outlined,
-                                  color: Colors.red,
-                                  size: 20,
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.stretch,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'To',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    TextField(
-                                      controller: toLocationController,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          toLocation = value;
-                                          updateSearchButtonState();
-                                        });
-                                      },
-                                      decoration: InputDecoration(
-                                        hintText: 'Unload to....',
-                                        border: OutlineInputBorder(),
-                                        contentPadding: EdgeInsets.symmetric(
-                                          horizontal: 15,
-                                          vertical: 10,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          // Search Button
-                          SizedBox(height: 20),
-                          Row(
-                            children: [
-                              Padding(padding: EdgeInsets.only(left: 30)),
-                              ElevatedButton(
-                                onPressed: isSearchEnabled
-                                    ? _searchButtonPressed
-                                    : null,
-                                style: ElevatedButton.styleFrom(
-                                  fixedSize: Size(277, 40),
-                                  primary: Colors.grey[400],
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: Text(
-                                  'Search',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 18,
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: Container(
+                                width: 18,
+                                height: 18,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
                                     color: Colors.black,
+                                    width: 4,
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                    Container(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(bottom: 50),
-                            child: GestureDetector(
-                              onTap: swapTextFields,
-                              child: Image.asset("assets/Vector.png"),
                             ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 5, left: 5),
+                              child: Icon(
+                                Icons.circle_outlined,
+                                color: Colors.transparent,
+                                size: 1,
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Text(
+                                    'From',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  TextField(
+                                    controller: fromLocationController,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        fromLocation = value;
+                                      });
+                                      fetchFromSuggestions(value).then((suggestions) {
+                                        setState(() {
+                                          fromLocationSuggestions = suggestions;
+                                        });
+                                      }).catchError((error) {
+                                        print('Error fetching suggestions: $error');
+                                      });
+                                    },
+                                    decoration: InputDecoration(
+                                      hintText: 'Load it....',
+                                      border: OutlineInputBorder(),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 15,
+                                        vertical: 10,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: Icon(
+                                Icons.location_on_outlined,
+                                color: Colors.red,
+                                size: 20,
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'To',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  TextField(
+                                    controller: toLocationController,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        toLocation = value;
+                                      });
+                                      fetchFromSuggestions(value).then((suggestions) {
+                                        setState(() {
+                                          toLocationSuggestions = suggestions;
+                                        });
+                                      }).catchError((error) {
+                                        print('Error fetching suggestions: $error');
+                                      });
+                                    },
+                                    decoration: InputDecoration(
+                                      hintText: 'Unload to....',
+                                      border: OutlineInputBorder(),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 15,
+                                        vertical: 10,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Padding(padding: EdgeInsets.only(left: 30)),
+                            ElevatedButton(
+                              onPressed: isSearchEnabled ? _searchButtonPressed : null,
+                              style: ElevatedButton.styleFrom(
+                                fixedSize: Size(277, 40),
+                                primary: Colors.grey[400],
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text(
+                                'Search',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 10)
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (fromLocationSuggestions.isNotEmpty)
+                    Positioned(
+                      top: 110,
+                      left: 16,
+                      right: 16,
+                      child: Container(
+                        constraints: BoxConstraints(maxHeight: 200),
+                        color: Colors.white,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: fromLocationSuggestions.map((suggestion) {
+                              return ListTile(
+                                title: Text(suggestion.displayName),
+                                onTap: () {
+                                  setState(() {
+                                    fromLocationController.text = suggestion.displayName;
+                                    fromLocationSuggestions.clear();
+                                    updateSearchButtonState();
+                                  });
+                                },
+                              );
+                            }).toList(),
                           ),
-                        ],
+                        ),
                       ),
                     ),
-                  ],
-                ),
+                  if (toLocationSuggestions.isNotEmpty)
+                    Positioned(
+                      top: 210,
+                      left: 16,
+                      right: 16,
+                      child: Container(
+                        constraints: BoxConstraints(maxHeight: 200),
+                        color: Colors.white,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: toLocationSuggestions.map((suggestion) {
+                              return ListTile(
+                                title: Text(suggestion.displayName),
+                                onTap: () {
+                                  setState(() {
+                                    toLocationController.text = suggestion.displayName;
+                                    toLocationSuggestions.clear(); // Clear suggestions after selection
+                                    updateSearchButtonState();
+                                  });
+                                },
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
               Container(
                 decoration: BoxDecoration(
@@ -359,7 +434,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                '${fromLocation ?? 'Not provided'}',
+                                '${fromLocation}',
                                 style: TextStyle(fontSize: 16),
                               ),
                             ],
@@ -378,7 +453,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                '${toLocation ?? 'Not provided'}',
+                                '${toLocation}',
                                 style: TextStyle(fontSize: 16),
                               ),
                             ],
@@ -547,10 +622,9 @@ class _LoadsScreenState extends State<LoadsScreen> {
 
   void updateSearchButtonState() {
     setState(() {
-      isSearchEnabled = fromLocation != null &&
-          fromLocation!.isNotEmpty &&
-          toLocation != null &&
-          toLocation!.isNotEmpty;
+      isSearchEnabled = fromLocationController.text.isNotEmpty &&
+        //toLocationController.text != null &&  //new added
+          toLocationController.text.isNotEmpty;
     });
   }
 
@@ -558,13 +632,13 @@ class _LoadsScreenState extends State<LoadsScreen> {
     setState(() {
       isLoading = true;
       locationDetails.clear();
-      locationPairs.clear(); // Clear the previous suggestions
+      locationPairs.clear();
     });
 
     try {
       await Firebase.initializeApp();
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('/Transmaa_accepted_orders')
+          .collection('Transmaa_accepted_orders')
           .where('fromLocation', isEqualTo: fromLocation)
           .where('toLocation', isEqualTo: toLocation)
           .get();
@@ -574,17 +648,11 @@ class _LoadsScreenState extends State<LoadsScreen> {
           documentData =
           querySnapshot.docs.first.data() as Map<String, dynamic>?;
           isLoading = false;
+          showSuggestions = false; // Set to false to hide suggestion loads
         });
       } else {
-        setState(() {
-          isLoading = false;
-          documentData = null;
-          showSuggestions = true;
-        });
-
-        QuerySnapshot allLocationsSnapshot = await FirebaseFirestore.instance
-            .collection('/Transmaa_accepted_orders ')
-            .get();
+        QuerySnapshot allLocationsSnapshot =
+        await FirebaseFirestore.instance.collection('Transmaa_accepted_orders').get();
 
         List<String> allFromLocations = [];
         List<String> allToLocations = [];
@@ -594,7 +662,6 @@ class _LoadsScreenState extends State<LoadsScreen> {
           allToLocations.add(doc['toLocation']);
         });
 
-        // Filter locations to ensure they correspond as pairs
         List<Map<String, String>> pairs = [];
         for (int i = 0; i < allFromLocations.length; i++) {
           String from = allFromLocations[i];
@@ -611,6 +678,9 @@ class _LoadsScreenState extends State<LoadsScreen> {
             ...allToLocations,
           ];
           locationPairs = pairs;
+          isLoading = false;
+          documentData = null;
+          showSuggestions = true; // Set to true to show suggestion loads
         });
       }
     } catch (e) {
@@ -621,6 +691,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
       print('Error fetching data: $e');
     }
   }
+
 
   void swapTextFields() {
     String temp = fromLocationController.text;
