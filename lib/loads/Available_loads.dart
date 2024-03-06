@@ -266,6 +266,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     'To',
@@ -275,7 +276,6 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                       fontSize: 15,
                                     ),
                                   ),
-                                  SizedBox(width: 288),
                                   GestureDetector(
                                     onTap: () {
                                       setState(() {
@@ -563,7 +563,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
                                     ),
                                     ElevatedButton(
                                       style: ElevatedButton.styleFrom(
-                                        fixedSize: Size(120, 30),
+                                        fixedSize: Size(150, 30),
                                         primary: Colors.blueGrey,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
