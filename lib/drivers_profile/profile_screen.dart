@@ -77,7 +77,7 @@ class _ProfileState extends State<Profile> {
               Container(
                 margin: EdgeInsets.only(left: 20),
                 alignment: Alignment.topLeft,
-                child: Text('Profile :',style: TextStyle(fontSize:22,fontWeight: FontWeight.bold),),
+                child: Text('Profile',style: TextStyle(fontSize:22,fontWeight: FontWeight.bold),),
               ),
               Container(
                   width: MediaQuery.of(context).size.width * 0.96,
@@ -187,7 +187,7 @@ class _ProfileState extends State<Profile> {
                                   // crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 10,right: 40),
+                                      padding: const EdgeInsets.only(top: 10,right: 50),
                                       child: Text(
                                         "Confirm Logging Out",
                                         style: TextStyle(
@@ -198,7 +198,7 @@ class _ProfileState extends State<Profile> {
                                       ),
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 10,left: 20,right: 20),
+                                      padding: const EdgeInsets.only(top: 10,left: 20,right: 20,bottom: 25),
                                       child: Text(
                                         "Booking load is faster when you are logged in. Are you sure you want to logout?",
                                         style: TextStyle(
@@ -208,23 +208,27 @@ class _ProfileState extends State<Profile> {
                                       ),
                                     ),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.end,
                                       children: <Widget>[
-                                        TextButton(
-                                          onPressed: () async {
-                                            Navigator.of(context).pop();
-                                            SharedPreferences prefs =
-                                            await SharedPreferences.getInstance();
-                                            await prefs.remove('isLoggedIn');
-                                            Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => LoginScreen(onLogin: () {}, phoneNumber: ''),
-                                              ),
-                                            );
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(left: 120,top: 30),
+                                        Align(
+                                          alignment: Alignment.bottomRight,
+                                          child: TextButton(
+                                            onPressed: () async {
+                                              Navigator.of(context).pop();
+                                              SharedPreferences prefs =
+                                              await SharedPreferences.getInstance();
+                                              await prefs.remove('isLoggedIn');
+                                              Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      LoginScreen(
+                                                        onLogin: () {},
+                                                        phoneNumber: '',
+                                                      ),
+                                                ),
+                                              );
+                                            },
                                             child: Text(
                                               "Yes",
                                               style: TextStyle(
@@ -235,12 +239,12 @@ class _ProfileState extends State<Profile> {
                                             ),
                                           ),
                                         ),
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(top: 30,),
+                                        Align(
+                                          alignment: Alignment.bottomRight,
+                                          child: TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
                                             child: Text(
                                               "No",
                                               style: TextStyle(
