@@ -1,9 +1,12 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transmaa_drivers1/drivers_profile/profile/aboutpage.dart';
 import 'package:transmaa_drivers1/drivers_profile/profile/help.dart';
+import 'package:transmaa_drivers1/drivers_profile/profile/notifications.dart';
+import '../history_details/history_screen.dart';
 import '../login_registration/driver_login.dart';
 
 class Profile extends StatefulWidget {
@@ -74,6 +77,7 @@ class _ProfileState extends State<Profile> {
         children: [
           Column(
             children: [
+              SizedBox(height: 10,),
               Container(
                 margin: EdgeInsets.only(left: 20),
                 alignment: Alignment.topLeft,
@@ -123,7 +127,7 @@ class _ProfileState extends State<Profile> {
                   title: 'History', // History title
                   color: Colors.orangeAccent,
                   onTap: () {
-
+                   //_navigateToPage(HistoryScreen());
                   },
                 ),
                 SizedBox(height: 20),
@@ -133,6 +137,7 @@ class _ProfileState extends State<Profile> {
                   color: Colors.orangeAccent,
                   onTap: () {
 
+                    _navigateToPage(NotificationsPage());
                   },
                 ),
                 SizedBox(height: 20),
@@ -150,7 +155,7 @@ class _ProfileState extends State<Profile> {
                   title: 'About Us',
                   color: Colors.orangeAccent,
                   onTap: () {
-                    _navigateToPage(AboutPage());
+                    _navigateToPage(AboutUs());
                   },
                 ),
                 SizedBox(height: 20),
@@ -176,15 +181,13 @@ class _ProfileState extends State<Profile> {
                           builder: (BuildContext context) {
                             return Dialog(
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.zero, // No border radius
+                                borderRadius: BorderRadius.zero,
                               ),
-                              backgroundColor: Colors.white, // Set background color
+                              backgroundColor: Colors.white,
                               child: SizedBox(
                                 width: 250, // Set width
                                 height: 150, // Set height
                                 child: Column(
-                                  //mainAxisAlignment: MainAxisAlignment.,
-                                  // crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Padding(
                                       padding: const EdgeInsets.only(top: 10,right: 50),

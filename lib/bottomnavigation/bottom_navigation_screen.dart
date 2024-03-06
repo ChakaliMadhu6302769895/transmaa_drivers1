@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../appbar_icons/helpline_screen.dart';
-import '../appbar_icons/notification_screen.dart';
+import '../drivers_profile/profile/help.dart';
+import '../drivers_profile/profile/notifications.dart';
 import '../drivers_profile/profile_screen.dart';
 import '../loads/Available_loads.dart';
 import '../login_registration/driver_login.dart';
@@ -122,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => NotificationScreen(),
+                              builder: (context) => NotificationsPage(),
                             ),
                           );
                         },
@@ -145,7 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => HelplineScreen(),
+                              builder: (context) => HelpPage(),
                             ),
                           );
                         },

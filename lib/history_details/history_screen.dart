@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../appbar_icons/helpline_screen.dart';
-import '../appbar_icons/notification_screen.dart';
+import '../drivers_profile/profile/help.dart';
+import '../drivers_profile/profile/notifications.dart';
 
 class HistoryScreen extends StatelessWidget {
   final Map<String, dynamic>? documentData;
 
-  HistoryScreen(this.documentData);
+  const HistoryScreen(this.documentData, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +64,7 @@ class HistoryScreen extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => NotificationScreen(),
+                                  builder: (context) => NotificationsPage(),
                                 ),
                               );
                             },
@@ -86,7 +86,7 @@ class HistoryScreen extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => HelplineScreen(),
+                                  builder: (context) => HelpPage(),
                                 ),
                               );
                             },
