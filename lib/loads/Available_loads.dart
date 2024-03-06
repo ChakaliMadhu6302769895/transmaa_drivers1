@@ -34,27 +34,29 @@ class _LoadsScreenState extends State<LoadsScreen> {
   TextEditingController toLocationController = TextEditingController();
 
   User? driver;
+
   Map<String, dynamic>? documentData;
-  String fromLocation = '';
-  String toLocation = '';
+  String? fromLocation;
+  String? toLocation;
   List<String> locationDetails = [];
   bool isLoading = false;
   bool isSearchEnabled = false;
   bool isAccepted = false;
   bool showSuggestions = false;
   List<Map<String, String>> locationPairs = [];
+
   String selectedDate = '';
   String selectedTime = '';
   String selectedGoodsType = '';
   String selectedTruck = '';
-  String currentUser = '';
+  String currentUser = ''; // State variable to hold current user's name
   List<PlaceSuggestion> fromLocationSuggestions = [];
   List<PlaceSuggestion> toLocationSuggestions = [];
 
   @override
   void initState() {
     super.initState();
-    fetchDriverData();
+    fetchDriverData(); // Fetch current user's name when the widget initializes
   }
 
   Future<void> fetchDriverData() async {
@@ -79,7 +81,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
 
         // Extract user data from the document
         Map<String, dynamic>? driverData =
-        driverDoc.data() as Map<String, dynamic>?;
+            driverDoc.data() as Map<String, dynamic>?;
 
         if (driverData != null) {
           if (driverData.containsKey('name')) {
@@ -101,12 +103,14 @@ class _LoadsScreenState extends State<LoadsScreen> {
   Future<List<PlaceSuggestion>> fetchFromSuggestions(String query) async {
     try {
       final response = await http.get(
-        Uri.parse('https://nominatim.openstreetmap.org/search?q=$query&format=json&viewbox=68.1,6.5,97.4,35.5&bounded=1&countrycodes=in'),
+        Uri.parse(
+            'https://nominatim.openstreetmap.org/search?q=$query&format=json&viewbox=68.1,6.5,97.4,35.5&bounded=1&countrycodes=in'),
       );
 
       if (response.statusCode == 200) {
         List<dynamic> data = jsonDecode(response.body);
-        List<PlaceSuggestion> suggestions = data.map((json) => PlaceSuggestion.fromJson(json)).toList();
+        List<PlaceSuggestion> suggestions =
+            data.map((json) => PlaceSuggestion.fromJson(json)).toList();
         return suggestions;
       } else {
         throw Exception('Failed to load suggestions');
@@ -141,236 +145,226 @@ class _LoadsScreenState extends State<LoadsScreen> {
                 ],
               ),
               SizedBox(height: 10),
-              Stack(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    margin: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 3,
-                          blurRadius: 5,
-                          offset: Offset(0, 1),
-                        ),
-                      ],
+              Container(
+                width: double.infinity,
+                margin: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 3,
+                      blurRadius: 5,
+                      offset: Offset(0, 1),
                     ),
-                    padding: EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                  ],
+                ),
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
                       children: [
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 20),
-                              child: Container(
-                                width: 18,
-                                height: 18,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.black,
-                                    width: 4,
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: Container(
+                            width: 18,
+                            height: 18,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 4,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 5, left: 5),
+                          child: Icon(
+                            Icons.circle_outlined,
+                            color: Colors.transparent,
+                            size: 1,
+                          ),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                'From',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              TextField(
+                                controller: fromLocationController,
+                                onChanged: (value) {
+                                  fetchFromSuggestions(value)
+                                      .then((suggestions) {
+                                    setState(() {
+                                      fromLocationSuggestions = suggestions;
+                                    });
+                                  }).catchError((error) {
+                                    print('Error fetching suggestions: $error');
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  hintText: 'Load it....',
+                                  border: OutlineInputBorder(),
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 15,
+                                    vertical: 10,
                                   ),
                                 ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 5, left: 5),
-                              child: Icon(
-                                Icons.circle_outlined,
-                                color: Colors.transparent,
-                                size: 1,
-                              ),
-                            ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                              if (fromLocationSuggestions.isNotEmpty)
+                                Container(
+                                  color: Colors.white,
+                                  child: Column(
+                                    children: fromLocationSuggestions
+                                        .map((suggestion) {
+                                      return ListTile(
+                                        title: Text(suggestion.displayName),
+                                        onTap: () {
+                                          setState(() {
+                                            fromLocationController.text =
+                                                suggestion.displayName;
+                                            fromLocationSuggestions.clear();
+                                            updateSearchButtonState();
+                                          });
+                                        },
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: Icon(
+                            Icons.location_on_outlined,
+                            color: Colors.red,
+                            size: 20,
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
                                 children: [
                                   Text(
-                                    'From',
+                                    'To',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black,
                                       fontSize: 15,
                                     ),
                                   ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  TextField(
-                                    controller: fromLocationController,
-                                    onChanged: (value) {
+                                  SizedBox(width: 288),
+                                  GestureDetector(
+                                    onTap: () {
                                       setState(() {
-                                        fromLocation = value;
-                                      });
-                                      fetchFromSuggestions(value).then((suggestions) {
-                                        setState(() {
-                                          fromLocationSuggestions = suggestions;
-                                        });
-                                      }).catchError((error) {
-                                        print('Error fetching suggestions: $error');
+                                        swapTextFields();
                                       });
                                     },
-                                    decoration: InputDecoration(
-                                      hintText: 'Load it....',
-                                      border: OutlineInputBorder(),
-                                      contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 15,
-                                        vertical: 10,
-                                      ),
-                                    ),
+                                    child: Icon(Icons.swap_vert),
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 20),
-                              child: Icon(
-                                Icons.location_on_outlined,
-                                color: Colors.red,
-                                size: 20,
+                              SizedBox(
+                                height: 5,
                               ),
-                            ),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'To',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                          fontSize: 15,
-                                        ),
-                                      ),
-                                    ],
+                              TextField(
+                                controller: toLocationController,
+                                onChanged: (value) {
+                                  fetchFromSuggestions(value)
+                                      .then((suggestions) {
+                                    setState(() {
+                                      toLocationSuggestions = suggestions;
+                                    });
+                                  }).catchError((error) {
+                                    print('Error fetching suggestions: $error');
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  hintText: 'Unload to....',
+                                  border: OutlineInputBorder(),
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 15,
+                                    vertical: 10,
                                   ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  TextField(
-                                    controller: toLocationController,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        toLocation = value;
-                                      });
-                                      fetchFromSuggestions(value).then((suggestions) {
-                                        setState(() {
-                                          toLocationSuggestions = suggestions;
-                                        });
-                                      }).catchError((error) {
-                                        print('Error fetching suggestions: $error');
-                                      });
-                                    },
-                                    decoration: InputDecoration(
-                                      hintText: 'Unload to....',
-                                      border: OutlineInputBorder(),
-                                      contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 15,
-                                        vertical: 10,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Padding(padding: EdgeInsets.only(left: 30)),
-                            ElevatedButton(
-                              onPressed: isSearchEnabled ? _searchButtonPressed : null,
-                              style: ElevatedButton.styleFrom(
-                                fixedSize: Size(277, 40),
-                                primary: Colors.grey[400],
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              child: Text(
-                                'Search',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 18,
-                                  color: Colors.black,
+                              // Suggestions Container for 'To' location
+                              if (toLocationSuggestions.isNotEmpty)
+                                Container(
+                                  color: Colors.white,
+                                  child: Column(
+                                    children:
+                                        toLocationSuggestions.map((suggestion) {
+                                      return ListTile(
+                                        title: Text(suggestion.displayName),
+                                        onTap: () {
+                                          setState(() {
+                                            toLocationController.text =
+                                                suggestion.displayName;
+                                            toLocationSuggestions.clear();
+                                            updateSearchButtonState();
+                                          });
+                                        },
+                                      );
+                                    }).toList(),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            SizedBox(height: 10)
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                  if (fromLocationSuggestions.isNotEmpty)
-                    Positioned(
-                      top: 110,
-                      left: 16,
-                      right: 16,
-                      child: Container(
-                        constraints: BoxConstraints(maxHeight: 200),
-                        color: Colors.white,
-                        child: SingleChildScrollView(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: fromLocationSuggestions.map((suggestion) {
-                              return ListTile(
-                                title: Text(suggestion.displayName),
-                                onTap: () {
-                                  setState(() {
-                                    fromLocationController.text = suggestion.displayName;
-                                    fromLocationSuggestions.clear();
-                                    updateSearchButtonState();
-                                  });
-                                },
-                              );
-                            }).toList(),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed:
+                              isSearchEnabled ? _searchButtonPressed : null,
+                          style: ElevatedButton.styleFrom(
+                            fixedSize: Size(200, 40),
+                            primary: Colors.grey[400],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'Search',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 18,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  if (toLocationSuggestions.isNotEmpty)
-                    Positioned(
-                      top: 210,
-                      left: 16,
-                      right: 16,
-                      child: Container(
-                        constraints: BoxConstraints(maxHeight: 200),
-                        color: Colors.white,
-                        child: SingleChildScrollView(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: toLocationSuggestions.map((suggestion) {
-                              return ListTile(
-                                title: Text(suggestion.displayName),
-                                onTap: () {
-                                  setState(() {
-                                    toLocationController.text = suggestion.displayName;
-                                    toLocationSuggestions.clear(); // Clear suggestions after selection
-                                    updateSearchButtonState();
-                                  });
-                                },
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
+                  ],
+                ),
               ),
               Container(
                 decoration: BoxDecoration(
@@ -390,228 +384,226 @@ class _LoadsScreenState extends State<LoadsScreen> {
                 child: isLoading
                     ? CircularProgressIndicator()
                     : documentData != null
-                    ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      "Available Loads : ",
-                      style: TextStyle(
-                          fontSize: 20, color: Colors.black),
-                    ),
-                    Divider(
-                      thickness: 2,
-                      color: Colors.brown,
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 3,
-                            blurRadius: 5,
-                            offset: Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      padding: EdgeInsets.all(15),
-                      child: Column(
-                        children: [
-                          Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Text(
-                                'From Location:',
+                                "Available Loads : ",
                                 style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                    fontSize: 20, color: Colors.black),
                               ),
-                              SizedBox(height: 5),
-                              Text(
-                                '${fromLocation}',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'To Location:',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 5),
-                              Text(
-                                '${toLocation}',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Goods Type:',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      '${documentData!['selectedGoodsType']}',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                ),
+                              Divider(
+                                thickness: 2,
+                                color: Colors.brown,
                               ),
                               SizedBox(
                                 height: 10,
-                                width: 20,
                               ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Date:',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      '${formatDate(documentData!['selectedDate'])}',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Truck:',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      '${documentData!['selectedTruck']}',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: 20,
-                              ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Time:',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      '${documentData!['selectedTime']}',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Divider(
-                            thickness: 1,
-                            color: Colors.black,
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              fixedSize: Size(120, 30),
-                              primary: Colors.blueGrey,
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(20),
-                              ),
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                isAccepted = true;
-                              });
-                              _acceptButtonPressed();
-                            },
-                            child: Text(
-                              isAccepted ? 'Accepted' : 'Accept',
-                              style: TextStyle(
-                                  fontSize: 18,
+                              Container(
+                                decoration: BoxDecoration(
                                   color: Colors.white,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                )
-                    : showSuggestions
-                    ? SuggestionsContainer(
-                  fromLocations: locationDetails,
-                  toLocations: locationDetails,
-                  locationPairs: locationPairs,
-                  selectedDate: selectedDate,
-                  selectedTime: selectedTime,
-                  selectedGoodsType: selectedGoodsType,
-                  selectedTruck: selectedTruck,
-                  driverName: currentUser,
-                  driverPhoneNumber: driver?.phoneNumber ?? '',
-                  onClose: () {},
-                  parentContext: context,
-                )
-                    : Text('No document data available'),
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 3,
+                                      blurRadius: 5,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                                padding: EdgeInsets.all(15),
+                                child: Column(
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Container(
+                                          alignment: Alignment.topLeft,
+                                          child: Text(
+                                            'From Location:',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        SizedBox(height: 5),
+                                        Container(
+                                          alignment: Alignment.topLeft,
+                                          child: Text('$fromLocation'),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Column(
+                                      children: [
+                                        Container(
+                                          alignment: Alignment.topLeft,
+                                          child: Text(
+                                            'To Location:',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        SizedBox(height: 5),
+                                        Container(
+                                          alignment: Alignment.topLeft,
+                                          child: Text('$toLocation'),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Goods Type:',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: 5),
+                                              Text(
+                                                '${documentData!['selectedGoodsType']}',
+                                                style: TextStyle(fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                          width: 20,
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Date:',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: 5),
+                                              Text(
+                                                '${formatDate(documentData!['selectedDate'])}',
+                                                style: TextStyle(fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Truck:',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: 5),
+                                              Text(
+                                                '${documentData!['selectedTruck']}',
+                                                style: TextStyle(fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 20,
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Time:',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: 5),
+                                              Text(
+                                                '${documentData!['selectedTime']}',
+                                                style: TextStyle(fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Divider(
+                                      thickness: 1,
+                                      color: Colors.black,
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        fixedSize: Size(120, 30),
+                                        primary: Colors.blueGrey,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          isAccepted = true;
+                                        });
+                                        _acceptButtonPressed();
+                                      },
+                                      child: Text(
+                                        isAccepted ? 'Accepted' : 'Accept',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          )
+                        : showSuggestions
+                            ? SuggestionsContainer(
+                                fromLocations: locationDetails,
+                                toLocations: locationDetails,
+                                locationPairs: locationPairs,
+                                selectedDate: selectedDate,
+                                selectedTime: selectedTime,
+                                selectedGoodsType: selectedGoodsType,
+                                selectedTruck: selectedTruck,
+                                driverName: currentUser,
+                                driverPhoneNumber: driver?.phoneNumber ?? '',
+                                onClose: () {},
+                                parentContext: context,
+                              )
+                            : Text('No document data available'),
               )
             ],
           ),
@@ -623,7 +615,6 @@ class _LoadsScreenState extends State<LoadsScreen> {
   void updateSearchButtonState() {
     setState(() {
       isSearchEnabled = fromLocationController.text.isNotEmpty &&
-        //toLocationController.text != null &&  //new added
           toLocationController.text.isNotEmpty;
     });
   }
@@ -632,13 +623,18 @@ class _LoadsScreenState extends State<LoadsScreen> {
     setState(() {
       isLoading = true;
       locationDetails.clear();
-      locationPairs.clear();
+      locationPairs.clear(); // Clear the previous suggestions
     });
 
     try {
       await Firebase.initializeApp();
+
+      // Update fromLocation and toLocation with the text from the controllers
+      fromLocation = fromLocationController.text;
+      toLocation = toLocationController.text;
+
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('Transmaa_accepted_orders')
+          .collection('/Transmaa_accepted_orders')
           .where('fromLocation', isEqualTo: fromLocation)
           .where('toLocation', isEqualTo: toLocation)
           .get();
@@ -646,42 +642,19 @@ class _LoadsScreenState extends State<LoadsScreen> {
       if (querySnapshot.docs.isNotEmpty) {
         setState(() {
           documentData =
-          querySnapshot.docs.first.data() as Map<String, dynamic>?;
+              querySnapshot.docs.first.data() as Map<String, dynamic>?;
           isLoading = false;
-          showSuggestions = false; // Set to false to hide suggestion loads
         });
       } else {
-        QuerySnapshot allLocationsSnapshot =
-        await FirebaseFirestore.instance.collection('Transmaa_accepted_orders').get();
-
-        List<String> allFromLocations = [];
-        List<String> allToLocations = [];
-
-        allLocationsSnapshot.docs.forEach((doc) {
-          allFromLocations.add(doc['fromLocation']);
-          allToLocations.add(doc['toLocation']);
-        });
-
-        List<Map<String, String>> pairs = [];
-        for (int i = 0; i < allFromLocations.length; i++) {
-          String from = allFromLocations[i];
-          String to = allToLocations[i];
-
-          if (from != null && to != null) {
-            pairs.add({'from': from, 'to': to});
-          }
-        }
-
+        // No available loads found, show suggestions
         setState(() {
-          locationDetails = [
-            ...allFromLocations,
-            ...allToLocations,
-          ];
-          locationPairs = pairs;
           isLoading = false;
           documentData = null;
-          showSuggestions = true; // Set to true to show suggestion loads
+          showSuggestions = true;
         });
+
+        // Fetch and populate suggestion data
+        fetchFromSuggestions;
       }
     } catch (e) {
       setState(() {
@@ -691,7 +664,6 @@ class _LoadsScreenState extends State<LoadsScreen> {
       print('Error fetching data: $e');
     }
   }
-
 
   void swapTextFields() {
     String temp = fromLocationController.text;
@@ -718,7 +690,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
       User? driver = FirebaseAuth.instance.currentUser;
       // Add the accepted load to the 'DriversAcceptedOrders' collection
       DocumentReference acceptedOrderRef =
-      await firestore.collection('DriversAcceptedOrders').add({
+          await firestore.collection('DriversAcceptedOrders').add({
         'driverName': currentUser, // Include the driver's name
         'driverPhoneNumber': driver?.phoneNumber,
         'fromLocation': documentData!['fromLocation'],
@@ -729,7 +701,7 @@ class _LoadsScreenState extends State<LoadsScreen> {
         'selectedTruck': documentData!['selectedTruck'],
         'customerName': documentData!['customerName'],
         'customerphoneNumber': documentData!['customerphoneNumber'],
-        'status': 'Accepted',
+        'status': 'Pending',
       });
 
       // Get the document ID of the newly added document in 'DriversAcceptedOrders' collection
@@ -745,11 +717,11 @@ class _LoadsScreenState extends State<LoadsScreen> {
             .where('selectedDate', isEqualTo: documentData!['selectedDate'])
             .where('selectedTime', isEqualTo: documentData!['selectedTime'])
             .where('selectedGoodsType',
-            isEqualTo: documentData!['selectedGoodsType'])
+                isEqualTo: documentData!['selectedGoodsType'])
             .where('selectedTruck', isEqualTo: documentData!['selectedTruck'])
             .where('customerName', isEqualTo: documentData!['customerName'])
             .where('customerphoneNumber',
-            isEqualTo: documentData!['customerphoneNumber'])
+                isEqualTo: documentData!['customerphoneNumber'])
             .get();
 
         // Check if any matching documents found

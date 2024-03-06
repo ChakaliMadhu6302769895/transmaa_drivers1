@@ -12,10 +12,10 @@ class SuggestionsContainer extends StatefulWidget {
   final String selectedTime;
   final String selectedGoodsType;
   final String selectedTruck;
-  final String driverName; // Add driver's name as a parameter
+  final String driverName;
   final String driverPhoneNumber;
   final void Function() onClose;
-  final BuildContext parentContext; // Add parent context
+  final BuildContext parentContext;
 
   const SuggestionsContainer({
     Key? key,
@@ -315,8 +315,8 @@ String selectedGoodsType = 'Furniture';
 String selectedTruck = 'Truck A';
 
 class MyWidget extends StatelessWidget {
-  final String currentUser; // Define currentUser as a parameter
-  final User? driver; // Define driver as a parameter
+  final String currentUser;
+  final User? driver;
 
   MyWidget({
     required this.currentUser,
@@ -337,7 +337,7 @@ class MyWidget extends StatelessWidget {
         driverName: currentUser,
         driverPhoneNumber: driver?.phoneNumber ?? '',
         onClose: () {},
-        parentContext: context, // Pass the parent context
+        parentContext: context,
       ),
     );
   }

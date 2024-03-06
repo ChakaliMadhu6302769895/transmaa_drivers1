@@ -59,11 +59,9 @@ class _ProfileState extends State<Profile> {
             });
           }
         } else {
-          // Handle the case where driverData is null
           print('Driver data is null.');
         }
       } else {
-        // Handle the case where no documents match the query
         print('No driver document found for the current user.');
       }
     }
@@ -82,7 +80,7 @@ class _ProfileState extends State<Profile> {
                 child: Text('Profile :',style: TextStyle(fontSize:22,fontWeight: FontWeight.bold),),
               ),
               Container(
-                  width: 370,
+                  width: MediaQuery.of(context).size.width * 0.96,
                   child: Divider(thickness: 1,color: Colors.black,)
               ),
               Row(
@@ -155,122 +153,124 @@ class _ProfileState extends State<Profile> {
                     _navigateToPage(AboutPage());
                   },
                 ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 50,left: 50,bottom: 50),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ButtonStyle(
-                  elevation: MaterialStateProperty.all<double>(5.0),
-                  backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                        (Set<MaterialState> states) {
-                      if (states.contains(MaterialState.hovered)) {
-                        return Colors.orangeAccent;
-                      }
-                      return Colors.grey.shade500;
-                    },
-                  ),
-                ),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Dialog(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero, // No border radius
+                SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.only(right: 50,left: 50,bottom: 50),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        elevation: MaterialStateProperty.all<double>(5.0),
+                        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                            if (states.contains(MaterialState.hovered)) {
+                              return Colors.orangeAccent;
+                            }
+                            return Colors.grey.shade500;
+                          },
                         ),
-                        backgroundColor: Colors.white, // Set background color
-                        child: SizedBox(
-                          width: 250, // Set width
-                          height: 150, // Set height
-                          child: Column(
-                            //mainAxisAlignment: MainAxisAlignment.,
-                           // crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(top: 10,right: 40),
-                                child: Text(
-                                  "Confirm Logging Out",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                      ),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Dialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.zero, // No border radius
                               ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 10,left: 20,right: 20),
-                                child: Text(
-                                    "Booking load is faster when you are logged in. Are you sure you want to logout?",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  TextButton(
-                                    onPressed: () async {
-                                      Navigator.of(context).pop();
-                                      SharedPreferences prefs =
-                                      await SharedPreferences.getInstance();
-                                      await prefs.remove('isLoggedIn');
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => LoginScreen(onLogin: () {}, phoneNumber: ''),
-                                        ),
-                                      );
-                                    },
-                                   child: Padding(
-                                     padding: const EdgeInsets.only(left: 120,top: 30),
-                                     child: Text(
-                                       "Yes",
-                                       style: TextStyle(
-                                         color: Colors.blue,
-                                         fontWeight: FontWeight.bold,
-                                         fontSize: 15,
-                                       ),
-                                     ),
-                                   ),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 30,),
+                              backgroundColor: Colors.white, // Set background color
+                              child: SizedBox(
+                                width: 250, // Set width
+                                height: 150, // Set height
+                                child: Column(
+                                  //mainAxisAlignment: MainAxisAlignment.,
+                                  // crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 10,right: 40),
                                       child: Text(
-                                        "No",
+                                        "Confirm Logging Out",
                                         style: TextStyle(
-                                          color: Colors.blue,
+                                          fontSize: 20,
+                                          color: Colors.black,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 15,
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 10,left: 20,right: 20),
+                                      child: Text(
+                                        "Booking load is faster when you are logged in. Are you sure you want to logout?",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        TextButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            SharedPreferences prefs =
+                                            await SharedPreferences.getInstance();
+                                            await prefs.remove('isLoggedIn');
+                                            Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => LoginScreen(onLogin: () {}, phoneNumber: ''),
+                                              ),
+                                            );
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(left: 120,top: 30),
+                                            child: Text(
+                                              "Yes",
+                                              style: TextStyle(
+                                                color: Colors.blue,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(top: 30,),
+                                            child: Text(
+                                              "No",
+                                              style: TextStyle(
+                                                color: Colors.blue,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-                child: Text(
-                  "Logout",
-                  style: TextStyle(color: Colors.black, fontSize: 20),
-                ),
-              ),
+                            );
+                          },
+                        );
+                      },
+                      child: Text(
+                        "Logout",
+                        style: TextStyle(color: Colors.black, fontSize: 20),
+                      ),
+                    ),
+                  ),
+                )
+              ],
             ),
-          )
+          ),
+
         ],
       ),
     );
